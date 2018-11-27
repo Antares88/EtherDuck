@@ -18,14 +18,6 @@ contract NetworkChecker {
 	
 	Network public network;
 	
-	struct ContractAddresses {
-		address Mainnet;
-		address Ropsten;
-		address Rinkeby;
-		address Kovan;
-		address Unknown;
-	}
-	
 	// 주어진 주소가 스마트 계약인지 확인합니다.
 	function checkIsSmartContract(address addr) private view returns (bool) {
 		uint32 size;
