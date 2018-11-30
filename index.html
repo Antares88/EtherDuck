@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge, chrome=1">
+		<link rel="shortcut icon" href="resource/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="resource/UPPERCASE-BOOT/R/BASE_STYLE.css" />
+		<title>EtherDuck</title>
+	</head>
+	<body>
+	    <noscript>
+            <p style="padding:15px;">
+            	이더덕은 이더리움 덕후들을 위한 게시판 서비스입니다.<br>
+            	EtherDuck is bbs for Ethereum manias.<br>
+            	<br>
+            	자바스크립트 기능이 꺼져있습니다. 브라우저의 자바스크립트 기능을 켜 주시기 바랍니다.<br>
+            	JavaScript is disabled. Please enable JavaScript in your browser.
+            </p>
+        </noscript>
+		<script src="js/UPPERCASE-CORE/BROWSER.js"></script>
+		<script>BOX('UUI');</script>
+		<script src="js/UUI/BROWSER.js"></script>
+		<!-- 개발 모드 -->
+		<script>//CONFIG.isDevMode = true;</script>
+		<script src="js/Contract2Object.js"></script>
+		<script src="js/WalletManager.js"></script>
+		<script>INIT_OBJECTS();</script>
+		<script src="js/app.js"></script>
+	</body>
+</html>
