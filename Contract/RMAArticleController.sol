@@ -13,7 +13,6 @@ contract RMAArticleController is RMAArticleControllerInterface {
 	
 	Article[] public articles;
 	
-	mapping(uint => address) public articleIdToWriter;
 	mapping(address => uint[]) public writerToArticleIds;
 	mapping(bytes32 => uint[]) public categoryHashToArticleIds;
 	
@@ -26,7 +25,6 @@ contract RMAArticleController is RMAArticleControllerInterface {
 			content : content
 		})).sub(1);
 		
-		articleIdToWriter[articleId] = msg.sender;
 		writerToArticleIds[msg.sender].push(articleId);
 		categoryHashToArticleIds[keccak256(abi.encodePacked(category))].push(articleId);
 		
@@ -38,8 +36,26 @@ contract RMAArticleController is RMAArticleControllerInterface {
 		return (article.writer, article.category, article.title, article.content);
 	}
 	
-	function getWriterByArticleId(uint articleId) external view returns (address) {
-		return articleIdToWriter[articleId];
+	function update(uint articleId, string category, string title, string content) external {
+		
+		Article storage article = articles[articleId];
+		
+		require(article.writer == msg.sender);
+		
+		article.category = category;
+		article.title = title;
+		article.content = content;
+		
+		emit Update(articleId, msg.sender, category, title, content);
+	}
+	
+	function remove(uint articleId) external {
+		
+		require(articles[articleId].writer == msg.sender);
+		
+		delete articles[articleId];
+		
+		emit Remove(articleId);
 	}
 	
 	function getArticleIdsByWriter(address writer) external view returns (uint[]) {
