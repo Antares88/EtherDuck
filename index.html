@@ -4,8 +4,10 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge, chrome=1">
-		<link rel="shortcut icon" href="resource/favicon.ico" />
-		<link rel="stylesheet" type="text/css" href="resource/UPPERCASE-BOOT/R/BASE_STYLE.css" />
+		<link rel="shortcut icon" href="EtherDuck/R/favicon.ico" />
+		<link href="UPPERCASE-BOOT/R/BASE_STYLE.css" rel="stylesheet" />
+		<link href="BOX/FontAwesome/R/css/all.min.css" rel="stylesheet" />
+		<link href="https://fonts.googleapis.com/css?family=Rock+Salt" rel="stylesheet">
 		<title>EtherDuck</title>
 	</head>
 	<body>
@@ -18,14 +20,57 @@
             	JavaScript is disabled. Please enable JavaScript in your browser.
             </p>
         </noscript>
-		<script src="js/UPPERCASE-CORE/BROWSER.js"></script>
+		<script src="UPPERCASE-CORE/BROWSER.js"></script>
+		<!-- BOX -->
 		<script>BOX('UUI');</script>
-		<script src="js/UUI/BROWSER.js"></script>
-		<!-- 개발 모드 -->
-		<script>//CONFIG.isDevMode = true;</script>
-		<script src="js/Contract2Object.js"></script>
-		<script src="js/WalletManager.js"></script>
-		<script>INIT_OBJECTS();</script>
-		<script src="js/app.js"></script>
+		<script src="BOX/UUI/BROWSER.js"></script>
+		<script>BOX('Yogurt');</script>
+		<script src="BOX/Yogurt/BROWSER.js"></script>
+		<script>BOX('FontAwesome');</script>
+		<script src="BOX/FontAwesome/BROWSER.js"></script>
+		<script>BOX('Contract2Object');</script>
+		<script src="BOX/Contract2Object/BROWSER.js"></script>
+		<!-- EtherDuck -->
+		<script>BOX('EtherDuck');</script>
+		<script src="EtherDuck/BROWSER/VIEW/Home.js"></script>
+		<script src="EtherDuck/BROWSER/MAIN.js"></script>
+		<script>
+		RUN(() => {
+			
+			CONFIG.defaultBoxName = 'EtherDuck';
+			
+			FOR_BOX((box) => {
+				if (box.OVERRIDE !== undefined) {
+					box.OVERRIDE();
+				}
+			});
+		
+			INIT_OBJECTS();
+		
+			FOR_BOX((box) => {
+				if (box.MAIN !== undefined) {
+					box.MAIN();
+				}
+			});
+		});
+		</script>
+		<script>
+		RUN(() => {
+			if (location.search !== '') {
+				let query = {};
+				location.search.slice(1).split('&').forEach((value) => {
+					let splits = value.split('=');
+					query[splits[0]] = splits.slice(1).join('=').replace(/~and~/g, '&');
+				});
+				if (query.p !== undefined) {
+					history.replaceState(TO_DELETE, TO_DELETE,
+						location.pathname.slice(0, -1) + (query.p || '') +
+						(query.q !== undefined ? ('?' + query.q) : '') +
+						location.hash
+					);
+				}
+			}
+		});
+		</script>
 	</body>
 </html>
