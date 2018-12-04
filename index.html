@@ -22,18 +22,42 @@
         </noscript>
 		<script src="UPPERCASE-CORE/BROWSER.js"></script>
 		<!-- BOX -->
+		<script>BOX('Contract2Object');</script>
+		<script src="BOX/Contract2Object/BROWSER.js"></script>
 		<script>BOX('UUI');</script>
 		<script src="BOX/UUI/BROWSER.js"></script>
 		<script>BOX('Yogurt');</script>
 		<script src="BOX/Yogurt/BROWSER.js"></script>
+		<script>BOX('Markdown');</script>
+		<script src="BOX/Markdown/BROWSER.js"></script>
 		<script>BOX('FontAwesome');</script>
 		<script src="BOX/FontAwesome/BROWSER.js"></script>
-		<script>BOX('Contract2Object');</script>
-		<script src="BOX/Contract2Object/BROWSER.js"></script>
 		<!-- EtherDuck -->
 		<script>BOX('EtherDuck');</script>
-		<script src="EtherDuck/BROWSER/VIEW/Home.js"></script>
+		<script src="EtherDuck/BROWSER/Yogurt.Theme.js"></script>
 		<script src="EtherDuck/BROWSER/MAIN.js"></script>
+		<script src="EtherDuck/BROWSER/VIEW/Layout.js"></script>
+		<script src="EtherDuck/BROWSER/VIEW/Home.js"></script>
+		<script src="EtherDuck/BROWSER/VIEW/Form.js"></script>
+		<script src="EtherDuck/BROWSER/VIEW/Article.js"></script>
+		<script>
+		RUN(() => {
+			if (location.search !== '') {
+				let query = {};
+				location.search.slice(1).split('&').forEach((value) => {
+					let splits = value.split('=');
+					query[splits[0]] = splits.slice(1).join('=').replace(/~and~/g, '&');
+				});
+				if (query.p !== undefined) {
+					history.replaceState(undefined, undefined,
+						location.pathname.slice(0, -1) + (query.p || '') +
+						(query.q !== undefined ? ('?' + query.q) : '') +
+						location.hash
+					);
+				}
+			}
+		});
+		</script>
 		<script>
 		RUN(() => {
 			
@@ -52,24 +76,6 @@
 					box.MAIN();
 				}
 			});
-		});
-		</script>
-		<script>
-		RUN(() => {
-			if (location.search !== '') {
-				let query = {};
-				location.search.slice(1).split('&').forEach((value) => {
-					let splits = value.split('=');
-					query[splits[0]] = splits.slice(1).join('=').replace(/~and~/g, '&');
-				});
-				if (query.p !== undefined) {
-					history.replaceState(TO_DELETE, TO_DELETE,
-						location.pathname.slice(0, -1) + (query.p || '') +
-						(query.q !== undefined ? ('?' + query.q) : '') +
-						location.hash
-					);
-				}
-			}
 		});
 		</script>
 	</body>
