@@ -85,7 +85,8 @@ EtherDuck.Form = CLASS({
 				}), A({
 					style : {
 						flt : 'right',
-						color : '#ffcc00'
+						color : '#ffcc00',
+						fontWeight : 'bold'
 					},
 					c : 'Markdown 사용법',
 					on : {

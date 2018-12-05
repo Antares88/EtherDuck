@@ -39,7 +39,8 @@ EtherDuck.Home = CLASS({
 							'그런데 손님, 이더덕은 이더리움 기반 서비스라 이더리움 네트워크에 연결이 되어야 사용이 가능하답니다! ㅜ.ㅜ\n',
 							'괜찮으시면 ', A({
 								style : {
-									color : '#ffcc00'
+									color : '#ffcc00',
+									fontWeight : 'bold'
 								},
 								href : INFO.getOSName() === 'iOS' ? 'https://itunes.apple.com/app/cipher-browser-for-ethereum/id1294572970?ls=1&mt=8' : 'https://play.google.com/store/apps/details?id=com.cipherbrowser.cipher',
 								c : 'Cipher Browser'
@@ -63,7 +64,8 @@ EtherDuck.Home = CLASS({
 							'그런데 손님, 이더덕은 이더리움 기반 서비스라 이더리움 네트워크에 연결이 되어야 사용이 가능하답니다! ㅜ.ㅜ\n',
 							'괜찮으시면 ', A({
 								style : {
-									color : '#ffcc00'
+									color : '#ffcc00',
+									fontWeight : 'bold'
 								},
 								href : 'https://metamask.io/',
 								c : 'MetaMask'
