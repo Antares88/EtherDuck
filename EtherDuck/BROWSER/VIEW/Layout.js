@@ -76,7 +76,39 @@ EtherDuck.Layout = CLASS((cls) => {
 							padding : '15px 20px',
 							fontSize : 14
 						},
-						c : '이더덕 개발'
+						c : '자유게시판',
+						on : {
+							tap : () => {
+								EtherDuck.GO('freeboard');
+								menuLayout.hideLeftMenu();
+							}
+						}
+					}), A({
+						style : {
+							display : 'block',
+							padding : '15px 20px',
+							fontSize : 14
+						},
+						c : '이더리움 뉴스',
+						on : {
+							tap : () => {
+								EtherDuck.GO('ethnews');
+								menuLayout.hideLeftMenu();
+							}
+						}
+					}), A({
+						style : {
+							display : 'block',
+							padding : '15px 20px',
+							fontSize : 14
+						},
+						c : '이더덕 개발/건의',
+						on : {
+							tap : () => {
+								EtherDuck.GO('etherduck');
+								menuLayout.hideLeftMenu();
+							}
+						}
 					})]
 				}),
 				
