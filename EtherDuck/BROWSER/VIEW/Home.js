@@ -13,9 +13,19 @@ EtherDuck.Home = CLASS({
 			
 			EtherDuck.Layout.setContent(DIV({
 				style : {
-					width : 700,
 					margin : 'auto',
-					padding : '50px 0'
+					padding : '50px 0',
+					onDisplayResize : (width, height) => {
+						if (width < 800) {
+							return {
+								width : '90%'
+							};
+						} else {
+							return {
+								width : 700
+							};
+						}
+					}
 				},
 				c : '이더리움 덕후들을 위한 게시판 서비스, 이더덕 개발중입니다 :)'
 			}));

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.1;
 
 // 숫자 계산 시 오버플로우 문제를 방지하기 위한 라이브러리
 contract NetworkChecker {
@@ -28,28 +28,42 @@ contract NetworkChecker {
 	constructor() public {
 		
 		// Main 네트워크인지 확인합니다.
-		if (checkIsSmartContract(MAINNET_MILESTONE_ADDRESS) == true && MAINNET_MILESTONE_ADDRESS.call(bytes4(keccak256("helloMainnet()"))) == true) {
-			network = Network.Mainnet;
+		if (checkIsSmartContract(MAINNET_MILESTONE_ADDRESS) == true) {
+			(bool success, ) = MAINNET_MILESTONE_ADDRESS.call(abi.encodeWithSignature("helloMainnet()"));
+			if (success == true) {
+				network = Network.Mainnet;
+				return;
+			}
 		}
 		
 		// Ropsten 네트워크인지 확인합니다.
-		else if (checkIsSmartContract(ROPSTEN_MILESTONE_ADDRESS) == true && ROPSTEN_MILESTONE_ADDRESS.call(bytes4(keccak256("helloRopsten()"))) == true) {
-			network = Network.Ropsten;
+		if (checkIsSmartContract(ROPSTEN_MILESTONE_ADDRESS) == true) {
+			(bool success, ) = ROPSTEN_MILESTONE_ADDRESS.call(abi.encodeWithSignature("helloRopsten()"));
+			if (success == true) {
+				network = Network.Ropsten;
+				return;
+			}
 		}
 		
 		// Rinkeby 네트워크인지 확인합니다.
-		else if (checkIsSmartContract(RINKEBY_MILESTONE_ADDRESS) == true && RINKEBY_MILESTONE_ADDRESS.call(bytes4(keccak256("helloRinkeby()"))) == true) {
-			network = Network.Rinkeby;
+		if (checkIsSmartContract(RINKEBY_MILESTONE_ADDRESS) == true) {
+			(bool success, ) = RINKEBY_MILESTONE_ADDRESS.call(abi.encodeWithSignature("helloRinkeby()"));
+			if (success == true) {
+				network = Network.Rinkeby;
+				return;
+			}
 		}
 		
 		// Kovan 네트워크인지 확인합니다.
-		else if (checkIsSmartContract(KOVAN_MILESTONE_ADDRESS) == true && KOVAN_MILESTONE_ADDRESS.call(bytes4(keccak256("helloKovan()"))) == true) {
-			network = Network.Kovan;
+		else if (checkIsSmartContract(KOVAN_MILESTONE_ADDRESS) == true) {
+			(bool success, ) = KOVAN_MILESTONE_ADDRESS.call(abi.encodeWithSignature("helloKovan()"));
+			if (success == true) {
+				network = Network.Kovan;
+				return;
+			}
 		}
 		
 		// 알 수 없는 네트워크
-		else {
-			network = Network.Unknown;
-		}
+		network = Network.Unknown;
 	}
 }

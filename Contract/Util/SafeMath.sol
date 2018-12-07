@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity ^0.5.1;
 
 // 숫자 계산 시 오버플로우 문제를 방지하기 위한 라이브러리
 library SafeMath {

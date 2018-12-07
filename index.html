@@ -44,6 +44,7 @@
 		<script src="EtherDuck/BROWSER/VIEW/Article.js"></script>
 		<script src="EtherDuck/BROWSER/VIEW/Form.js"></script>
 		<script src="EtherDuck/BROWSER/VIEW/MarkdownSample.js"></script>
+		<script src="EtherDuck/BROWSER/Contract/ArticleControllerContract.js"></script>
 		<script>
 		RUN(() => {
 			if (location.search !== '') {
@@ -66,6 +67,7 @@
 		RUN(() => {
 			
 			CONFIG.defaultBoxName = 'EtherDuck';
+			CONFIG.isTestnetMode = true;
 			
 			FOR_BOX((box) => {
 				if (box.OVERRIDE !== undefined) {

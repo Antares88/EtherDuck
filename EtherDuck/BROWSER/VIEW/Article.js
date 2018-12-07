@@ -8,9 +8,19 @@ EtherDuck.Article = CLASS({
 		
 		EtherDuck.Layout.setContent(DIV({
 			style : {
-				width : 700,
 				margin : 'auto',
-				padding : '50px 0'
+				padding : '50px 0',
+				onDisplayResize : (width, height) => {
+					if (width < 800) {
+						return {
+							width : '90%'
+						};
+					} else {
+						return {
+							width : 700
+						};
+					}
+				}
 			},
 			c : '글 내용'
 		}));

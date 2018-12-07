@@ -1,7 +1,7 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.1;
 
 import "./NetworkChecker.sol";
-import "./RMAArticleControllerInterface.sol";
+import "./ArticleControllerInterface.sol";
 
-contract ArticleWithGasController is NetworkChecker, RMAArticleControllerInterface {
+contract ArticleWithGasController is NetworkChecker, ArticleControllerInterface {
 }

@@ -1,14 +1,14 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.1;
 
-import "./RMALikeControllerInterface.sol";
+import "./LikeControllerInterface.sol";
 
-contract RMALikeController is RMALikeControllerInterface {
+contract LikeController is LikeControllerInterface {
 	
 	mapping(address => mapping(bytes32 => bool)) public checkTargetVoted;
 	mapping(bytes32 => uint) public targetHashToLikeCount;
 	mapping(bytes32 => uint) public targetHashToDislikeCount;
 	
-	function like(string target) external {
+	function like(string calldata target) external {
 		
 		bytes32 targetBytes = keccak256(abi.encodePacked(target));
 		
@@ -21,7 +21,7 @@ contract RMALikeController is RMALikeControllerInterface {
 		emit Like(msg.sender, target);
 	}
 	
-	function dislike(string target) external {
+	function dislike(string calldata target) external {
 		
 		bytes32 targetBytes = keccak256(abi.encodePacked(target));
 		
@@ -34,11 +34,11 @@ contract RMALikeController is RMALikeControllerInterface {
 		emit Dislike(msg.sender, target);
 	}
 	
-	function getLikeCountByTarget(string target) external view returns (uint) {
+	function getLikeCountByTarget(string calldata target) external view returns (uint) {
 		return targetHashToLikeCount[keccak256(abi.encodePacked(target))];
 	}
 	
-	function getDislikeCountByTarget(string target) external view returns (uint) {
+	function getDislikeCountByTarget(string calldata target) external view returns (uint) {
 		return targetHashToDislikeCount[keccak256(abi.encodePacked(target))];
 	}
 }

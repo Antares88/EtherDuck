@@ -8,11 +8,21 @@ EtherDuck.Form = CLASS({
 		
 		let preview;
 		
-		EtherDuck.Layout.setContent(DIV({
+		EtherDuck.Layout.setContent(FORM({
 			style : {
-				width : 732,
 				margin : 'auto',
-				padding : '40px 0'
+				padding : '40px 0',
+				onDisplayResize : (width, height) => {
+					if (width < 800) {
+						return {
+							width : '90%'
+						};
+					} else {
+						return {
+							width : 732
+						};
+					}
+				}
 			},
 			c : [
 			
@@ -30,6 +40,7 @@ EtherDuck.Form = CLASS({
 				style : {
 					marginTop : 20
 				},
+				name : 'category',
 				options : [OPTION({
 					value : 'etherduck.com/freeboard',
 					c : '자유게시판'
@@ -40,6 +51,7 @@ EtherDuck.Form = CLASS({
 				style : {
 					marginTop : 10
 				},
+				name : 'title',
 				placeholder : '글 제목'
 			}),
 			
@@ -48,6 +60,7 @@ EtherDuck.Form = CLASS({
 					marginTop : 10,
 					height : 300
 				},
+				name : 'content',
 				placeholder : '글 내용',
 				on : {
 					keyup : (e, textarea) => {
@@ -103,7 +116,15 @@ EtherDuck.Form = CLASS({
 						border : '1px solid #ccc'
 					}
 				})]
-			})]
+			})],
+			on : {
+				submit : (e, form) => {
+					
+					EtherDuck.ArticleControllerContract.write(form.getData(), () => {
+						console.log('test');
+					});
+				}
+			}
 		}));
 	}
 });

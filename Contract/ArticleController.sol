@@ -1,8 +1,8 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.1;
 
-import "./RMAArticleControllerInterface.sol";
+import "./ArticleControllerInterface.sol";
 
-contract RMAArticleController is RMAArticleControllerInterface {
+contract ArticleController is ArticleControllerInterface {
 	
 	struct Article {
 		address writer;
@@ -16,7 +16,7 @@ contract RMAArticleController is RMAArticleControllerInterface {
 	mapping(address => uint[]) public writerToArticleIds;
 	mapping(bytes32 => uint[]) public categoryHashToArticleIds;
 	
-	function write(string category, string title, string content) external {
+	function write(string calldata category, string calldata title, string calldata content) external {
 		
 		uint articleId = articles.push(Article({
 			writer : msg.sender,
@@ -31,12 +31,12 @@ contract RMAArticleController is RMAArticleControllerInterface {
 		emit Write(msg.sender, category, title, content);
 	}
 	
-	function read(uint articleId) external view returns (address writer, string category, string title, string content) {
+	function read(uint articleId) external view returns (address writer, string memory category, string memory title, string memory content) {
 		Article memory article = articles[articleId];
 		return (article.writer, article.category, article.title, article.content);
 	}
 	
-	function update(uint articleId, string category, string title, string content) external {
+	function update(uint articleId, string calldata category, string calldata title, string calldata content) external {
 		
 		Article storage article = articles[articleId];
 		
@@ -58,11 +58,11 @@ contract RMAArticleController is RMAArticleControllerInterface {
 		emit Remove(articleId);
 	}
 	
-	function getArticleIdsByWriter(address writer) external view returns (uint[]) {
+	function getArticleIdsByWriter(address writer) external view returns (uint[] memory) {
 		return writerToArticleIds[writer];
 	}
 	
-	function getArticleIdsByCategory(string category) external view returns (uint[]) {
+	function getArticleIdsByCategory(string calldata category) external view returns (uint[] memory) {
 		return categoryHashToArticleIds[keccak256(abi.encodePacked(category))];
 	}
 }
