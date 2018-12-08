@@ -9,31 +9,37 @@ contract ArticleController is ArticleControllerInterface {
 		string category;
 		string title;
 		string content;
+		uint writeTime;
+		uint lastUpdateTime;
 	}
 	
-	Article[] public articles;
+	Article[] private articles;
 	
-	mapping(address => uint[]) public writerToArticleIds;
-	mapping(bytes32 => uint[]) public categoryHashToArticleIds;
+	mapping(address => uint[]) private writerToArticleIds;
+	mapping(string => uint[]) private categoryToArticleIds;
 	
 	function write(string calldata category, string calldata title, string calldata content) external {
+		
+		uint writeTime = now;
 		
 		uint articleId = articles.push(Article({
 			writer : msg.sender,
 			category : category,
 			title : title,
-			content : content
+			content : content,
+			writeTime : writeTime,
+			lastUpdateTime : writeTime
 		})).sub(1);
 		
 		writerToArticleIds[msg.sender].push(articleId);
-		categoryHashToArticleIds[keccak256(abi.encodePacked(category))].push(articleId);
+		categoryToArticleIds[category].push(articleId);
 		
-		emit Write(msg.sender, category, title, content);
+		emit Write(msg.sender, category, title, content, writeTime);
 	}
 	
-	function read(uint articleId) external view returns (address writer, string memory category, string memory title, string memory content) {
+	function read(uint articleId) external view returns (address writer, string memory category, string memory title, string memory content, uint writeTime, uint lastUpdateTime) {
 		Article memory article = articles[articleId];
-		return (article.writer, article.category, article.title, article.content);
+		return (article.writer, article.category, article.title, article.content, article.writeTime, article.lastUpdateTime);
 	}
 	
 	function update(uint articleId, string calldata category, string calldata title, string calldata content) external {
@@ -42,11 +48,14 @@ contract ArticleController is ArticleControllerInterface {
 		
 		require(article.writer == msg.sender);
 		
+		uint updateTime = now;
+		
 		article.category = category;
 		article.title = title;
 		article.content = content;
+		article.lastUpdateTime = updateTime;
 		
-		emit Update(articleId, msg.sender, category, title, content);
+		emit Update(articleId, msg.sender, category, title, content, updateTime);
 	}
 	
 	function remove(uint articleId) external {
@@ -63,6 +72,6 @@ contract ArticleController is ArticleControllerInterface {
 	}
 	
 	function getArticleIdsByCategory(string calldata category) external view returns (uint[] memory) {
-		return categoryHashToArticleIds[keccak256(abi.encodePacked(category))];
+		return categoryToArticleIds[category];
 	}
 }

@@ -57,59 +57,42 @@ EtherDuck.Layout = CLASS((cls) => {
 					style : {
 						color : '#fff'
 					},
-					c : [A({
-						style : {
-							display : 'block',
-							padding : '15px 20px',
-							fontSize : 14
-						},
-						c : 'HOME',
-						on : {
-							tap : () => {
-								EtherDuck.GO('');
-								menuLayout.hideLeftMenu();
+					c : RUN(() => {
+						
+						let menus = [A({
+							style : {
+								display : 'block',
+								padding : '15px 20px',
+								fontSize : 14
+							},
+							c : 'HOME',
+							on : {
+								tap : () => {
+									EtherDuck.GO('');
+									menuLayout.hideLeftMenu();
+								}
 							}
-						}
-					}), A({
-						style : {
-							display : 'block',
-							padding : '15px 20px',
-							fontSize : 14
-						},
-						c : '자유게시판',
-						on : {
-							tap : () => {
-								EtherDuck.GO('freeboard');
-								menuLayout.hideLeftMenu();
-							}
-						}
-					}), A({
-						style : {
-							display : 'block',
-							padding : '15px 20px',
-							fontSize : 14
-						},
-						c : '이더리움 뉴스',
-						on : {
-							tap : () => {
-								EtherDuck.GO('ethnews');
-								menuLayout.hideLeftMenu();
-							}
-						}
-					}), A({
-						style : {
-							display : 'block',
-							padding : '15px 20px',
-							fontSize : 14
-						},
-						c : '이더덕 개발/건의',
-						on : {
-							tap : () => {
-								EtherDuck.GO('etherduck');
-								menuLayout.hideLeftMenu();
-							}
-						}
-					})]
+						})];
+						
+						EACH(EtherDuck.CategoryManager.getCategories(), (category) => {
+							menus.push(A({
+								style : {
+									display : 'block',
+									padding : '15px 20px',
+									fontSize : 14
+								},
+								c : EtherDuck.CategoryManager.getTitle(category),
+								on : {
+									tap : () => {
+										EtherDuck.GO(category);
+										menuLayout.hideLeftMenu();
+									}
+								}
+							}));
+						});
+						
+						return menus;
+					})
 				}),
 				
 				c : [menuLayoutContent = DIV()]

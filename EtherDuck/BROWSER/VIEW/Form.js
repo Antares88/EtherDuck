@@ -120,8 +120,43 @@ EtherDuck.Form = CLASS({
 			on : {
 				submit : (e, form) => {
 					
-					EtherDuck.ArticleControllerContract.write(form.getData(), () => {
-						console.log('test');
+					Contract2Object.checkWalletLocked((isLocked) => {
+						
+						if (isLocked === true) {
+							Yogurt.Alert({
+								msg : '이더리움 지갑이 잠겨있습니다. 지갑을 열어 잠금을 해제해주세요.'
+							});
+						}
+						
+						else {
+							
+							let data = form.getData();
+							
+							EtherDuck.ArticleControllerContract.write(data, {
+								
+								transactionAddress : (transactionAddress) => {
+									
+									Yogurt.Alert({
+										msg : ['트랜잭션이 등록되었습니다. 트랜잭션이 완료되면, 자동으로 글이 나타납니다.', BR(), A({
+											style : {
+												color : '#ffcc00',
+												fontWeight : 'bold'
+											},
+											target : '_blank',
+											href : 'https://etherscan.io/tx/' + transactionAddress,
+											c : 'EtherScan에서 보기'
+										})]
+									});
+									
+									EtherDuck.GO(data.category.substring('etherduck.com/'.length));
+								},
+								
+								success : () => {
+									
+									
+								}
+							});
+						}
 					});
 				}
 			}

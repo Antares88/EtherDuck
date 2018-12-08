@@ -4,41 +4,37 @@ import "./LikeControllerInterface.sol";
 
 contract LikeController is LikeControllerInterface {
 	
-	mapping(address => mapping(bytes32 => bool)) public checkTargetVoted;
-	mapping(bytes32 => uint) public targetHashToLikeCount;
-	mapping(bytes32 => uint) public targetHashToDislikeCount;
+	mapping(address => mapping(string => bool)) private checkTargetVoted;
+	mapping(string => uint) private targetToLikeCount;
+	mapping(string => uint) private targetToDislikeCount;
 	
 	function like(string calldata target) external {
 		
-		bytes32 targetBytes = keccak256(abi.encodePacked(target));
+		require(checkTargetVoted[msg.sender][target] != true);
 		
-		require(checkTargetVoted[msg.sender][targetBytes] != true);
+		checkTargetVoted[msg.sender][target] = true;
 		
-		checkTargetVoted[msg.sender][targetBytes] = true;
-		
-		targetHashToLikeCount[targetBytes].add(1);
+		targetToLikeCount[target].add(1);
 		
 		emit Like(msg.sender, target);
 	}
 	
 	function dislike(string calldata target) external {
 		
-		bytes32 targetBytes = keccak256(abi.encodePacked(target));
+		require(checkTargetVoted[msg.sender][target] != true);
 		
-		require(checkTargetVoted[msg.sender][targetBytes] != true);
+		checkTargetVoted[msg.sender][target] = true;
 		
-		checkTargetVoted[msg.sender][targetBytes] = true;
-		
-		targetHashToDislikeCount[targetBytes].add(1);
+		targetToDislikeCount[target].add(1);
 		
 		emit Dislike(msg.sender, target);
 	}
 	
 	function getLikeCountByTarget(string calldata target) external view returns (uint) {
-		return targetHashToLikeCount[keccak256(abi.encodePacked(target))];
+		return targetToLikeCount[target];
 	}
 	
 	function getDislikeCountByTarget(string calldata target) external view returns (uint) {
-		return targetHashToDislikeCount[keccak256(abi.encodePacked(target))];
+		return targetToDislikeCount[target];
 	}
 }

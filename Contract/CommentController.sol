@@ -8,30 +8,36 @@ contract CommentController is CommentControllerInterface {
 		address writer;
 		string target;
 		string content;
+		uint writeTime;
+		uint lastUpdateTime;
 	}
 	
-	Comment[] public comments;
+	Comment[] private comments;
 	
-	mapping(address => uint[]) public writerToCommentIds;
-	mapping(bytes32 => uint[]) public targetHashToCommentIds;
+	mapping(address => uint[]) private writerToCommentIds;
+	mapping(string => uint[]) private targetToCommentIds;
 	
 	function write(string calldata target, string calldata content) external {
+		
+		uint writeTime = now;
 		
 		uint commentId = comments.push(Comment({
 			writer : msg.sender,
 			target : target,
-			content : content
+			content : content,
+			writeTime : writeTime,
+			lastUpdateTime : writeTime
 		})).sub(1);
 		
 		writerToCommentIds[msg.sender].push(commentId);
-		targetHashToCommentIds[keccak256(abi.encodePacked(target))].push(commentId);
+		targetToCommentIds[target].push(commentId);
 		
-		emit Write(msg.sender, target, content);
+		emit Write(msg.sender, target, content, writeTime);
 	}
 	
-	function read(uint commentId) external view returns (address writer, string memory target, string memory content) {
+	function read(uint commentId) external view returns (address writer, string memory target, string memory content, uint writeTime, uint lastUpdateTime) {
 		Comment memory comment = comments[commentId];
-		return (comment.writer, comment.target, comment.content);
+		return (comment.writer, comment.target, comment.content, comment.writeTime, comment.lastUpdateTime);
 	}
 	
 	function update(uint commentId, string calldata content) external {
@@ -40,9 +46,12 @@ contract CommentController is CommentControllerInterface {
 		
 		require(comment.writer == msg.sender);
 		
-		comment.content = content;
+		uint updateTime = now;
 		
-		emit Update(commentId, msg.sender, content);
+		comment.content = content;
+		comment.lastUpdateTime = updateTime;
+		
+		emit Update(commentId, msg.sender, content, updateTime);
 	}
 	
 	function remove(uint commentId) external {
@@ -59,6 +68,6 @@ contract CommentController is CommentControllerInterface {
 	}
 	
 	function getCommentIdsByTarget(string calldata target) external view returns (uint[] memory) {
-		return targetHashToCommentIds[keccak256(abi.encodePacked(target))];
+		return targetToCommentIds[target];
 	}
 }
