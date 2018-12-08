@@ -30,6 +30,10 @@ contract LikeController is LikeControllerInterface {
 		emit Dislike(msg.sender, target);
 	}
 	
+	function checkTargetVoted(string calldata target) external view returns (bool) {
+		return checkTargetVoted[msg.sender][target];
+	}
+	
 	function getLikeCountByTarget(string calldata target) external view returns (uint) {
 		return targetToLikeCount[target];
 	}
