@@ -1,1 +1,462 @@
-global.Contract2Object=CLASS(t=>{let e=!1;"undefined"!=typeof global.web3&&(global.web3=new Web3(global.web3.currentProvider),e=!0);let n=t.checkWalletEnable=(()=>{return e}),u=(t.checkWalletLocked=(t=>{web3.eth.getAccounts((e,n)=>{t(0===n.length)})}),t.getWalletAddress=(t=>{web3.eth.getAccounts((e,n)=>{t(n[0])})}),(t,e)=>{if(0!==t.length){if(1===t.length){let n=t[0].type;if(void 0!==e.toNumber)return{value:e.toNumber(),str:e.toString(10)};if("[]"===n.substring(n.length-2)){let t=[],n=[];return EACH(e,(e,u)=>{void 0!==e.toNumber?(t.push(e.toNumber()),n.push(e.toString(10))):(t.push(e),n.push(String(e)))}),{value:t,str:n}}return{value:e,str:String(e)}}if(t.length>1){let n=[];return EACH(t,(t,u)=>{let o=t.type;if(void 0!==e[u].toNumber)n.push(e[u].toNumber());else if("[]"===o.substring(o.length-2)){let t=[];EACH(e[u],(e,n)=>{void 0!==e.toNumber?t.push(e.toNumber()):t.push(e)}),n.push(t)}else n.push(e[u])}),EACH(t,(t,u)=>{let o=t.type;if(void 0!==e[u].toNumber)n.push(e[u].toString(10));else if("[]"===o.substring(o.length-2)){let t=[];EACH(e[u],(e,n)=>{void 0!==e.toNumber?t.push(e.toString(10)):t.push(String(e))}),n.push(t)}else n.push(String(e[u]))}),{array:n}}}});return{init:(t,e,o)=>{let i,s=o.abi,r=o.address,a=(e.getAddress=(()=>{return r}),{});if(n()===!0)i=web3.eth.contract(s).at(r),i.allEvents((t,e)=>{if(t===TO_DELETE){let t=a[e.event];void 0!==t&&EACH(t,t=>{t(e.args)})}}),EACH(s,t=>{"function"===t.type&&(e[t.name]=((e,n)=>{void 0===n&&(n=e,e=void 0);let o,s,r;CHECK_IS_DATA(n)!==!0?o=n:(o=n.success,s=n.transactionAddress,r=n.error);let a=[];if(t.payable!==!0&&t.inputs.length<=1)a.push(e);else{let n=[];EACH(e,t=>{n.push(t)}),EACH(t.inputs,(t,u)=>{""!==t.name?a.push(e[t.name]):a.push(n[u])})}t.payable===!0&&a.push({value:web3.toWei(e.ether,"ether")}),a.push((n,i)=>{if(n!==TO_DELETE)void 0!==r?r(n.toString()):SHOW_ERROR(t.name,n.toString(),e);else if(t.constant===!0)void 0!==o&&(0===t.outputs.length?o():1===t.outputs.length?(i=u(t.outputs,i),o(i.value,i.str)):t.outputs.length>1&&(i=u(t.outputs,i),o.apply(TO_DELETE,i.array)));else if(void 0!==s&&s(i),void 0!==o){let n=RAR(()=>{web3.eth.getTransactionReceipt(i,(u,i)=>{u!==TO_DELETE?void 0!==r?r(u.toString()):SHOW_ERROR(t.name,u.toString(),e):i===TO_DELETE||i.blockHash===TO_DELETE?n():o()})})}}),i[t.name].apply(i,a)}))});else if(void 0!==global.UPPERCASE&&void 0!==UPPERCASE.ROOM){let t=UPPERCASE.ROOM("__Contract2Object/"+r);EACH(s,n=>{"function"===n.type&&(e[n.name]=((e,u)=>{void 0===u&&(u=e,e=void 0);let o,i,s;CHECK_IS_DATA(u)!==!0?o=u:(o=u.success,i=u.transactionAddress,s=u.error);let r=[];if(n.payable!==!0&&n.inputs.length<=1)r.push(e);else{let t=[];EACH(e,e=>{t.push(e)}),EACH(n.inputs,(n,u)=>{""!==n.name?r.push(e[n.name]):r.push(t[u])})}n.payable===!0&&r.push(web3.toWei(e.ether,"ether")),r.push(),t.send({methodName:n.name,data:e},t=>{n.constant===!0&&void 0!==o&&(0===n.outputs.length?o():1===n.outputs.length?o(t.value,t.str):n.outputs.length>1&&o.apply(TO_DELETE,t.array))})}))})}e.on=((t,e)=>{void 0===a[t]&&(a[t]=[]),a[t].push(e)}),e.off=((t,e)=>{void 0!==a[t]&&(void 0!==e&&REMOVE({array:a[t],value:e}),void 0!==e&&0!==a[t].length||delete a[t])})}}});
+global.Contract2Object = CLASS((cls) => {
+	
+	let isWeb3Enable = false;
+	
+	// Web3 체크
+	if (typeof global.web3 !== 'undefined') {
+		global.web3 = new Web3(global.web3.currentProvider);
+		isWeb3Enable = true;
+	}
+	
+	// 지갑을 사용할 수 있는지 확인
+	let checkWalletEnable = cls.checkWalletEnable = () => {
+		return isWeb3Enable;
+	};
+	
+	// 지갑이 잠금 상태인지 확인
+	let checkWalletLocked = cls.checkWalletLocked = (callback) => {
+		web3.eth.getAccounts((error, accounts) => {
+			callback(accounts.length === 0);
+		});
+	};
+	
+	// 지갑 주소를 가져옵니다.
+	let getWalletAddress = cls.getWalletAddress = (callback) => {
+		web3.eth.getAccounts((error, accounts) => {
+			callback(accounts[0]);
+		});
+	};
+	
+	// 결과를 정돈합니다.
+	let cleanResult = (outputs, result) => {
+		
+		// output이 없는 경우
+		if (outputs.length === 0) {
+			return undefined;
+		}
+		
+		// output이 1개인 경우
+		else if (outputs.length === 1) {
+			
+			let type = outputs[0].type;
+			
+			// 숫자인 경우
+			if (result.toNumber !== undefined) {
+				return {
+					value : result.toNumber(),
+					str : result.toString(10)
+				};
+			}
+			
+			// 배열인 경우
+			else if (type.substring(type.length - 2) === '[]') {
+				
+				let array = [];
+				let strArray = [];
+				EACH(result, (value, i) => {
+					if (value.toNumber !== undefined) {
+						array.push(value.toNumber());
+						strArray.push(value.toString(10));
+					} else {
+						array.push(value);
+						strArray.push(String(value));
+					}
+				});
+				
+				return {
+					value : array,
+					str : strArray
+				};
+			}
+			
+			// 기타
+			else {
+				return {
+					value : result,
+					str : String(result)
+				};
+			}
+		}
+		
+		// output이 여러개인 경우
+		else if (outputs.length > 1) {
+			
+			let resultArray = [];
+			
+			EACH(outputs, (output, i) => {
+				
+				let type = output.type;
+				
+				// 숫자인 경우
+				if (result[i].toNumber !== undefined) {
+					resultArray.push(result[i].toNumber());
+				}
+				
+				// 배열인 경우
+				else if (type.substring(type.length - 2) === '[]') {
+					
+					let array = [];
+					EACH(result[i], (value, j) => {
+						if (value.toNumber !== undefined) {
+							array.push(value.toNumber());
+						} else {
+							array.push(value);
+						}
+					});
+					
+					resultArray.push(array);
+				}
+				
+				// 기타
+				else {
+					resultArray.push(result[i]);
+				}
+			});
+			
+			EACH(outputs, (output, i) => {
+				
+				let type = output.type;
+				
+				// 숫자인 경우
+				if (result[i].toNumber !== undefined) {
+					resultArray.push(result[i].toString(10));
+				}
+				
+				// 배열인 경우
+				else if (type.substring(type.length - 2) === '[]') {
+					
+					let strArray = [];
+					EACH(result[i], (value, j) => {
+						if (value.toNumber !== undefined) {
+							strArray.push(value.toString(10));
+						} else {
+							strArray.push(String(value));
+						}
+					});
+					
+					resultArray.push(strArray);
+				}
+				
+				// 기타
+				else {
+					resultArray.push(String(result[i]));
+				}
+			});
+			
+			return {
+				array : resultArray
+			};
+		}
+	};
+	
+	return {
+		
+		init : (inner, self, params) => {
+			//REQUIRED: params
+			//REQUIRED: params.abi
+			//REQUIRED: params.address
+			
+			let abi = params.abi;
+			let address = params.address;
+			
+			let getAddress = self.getAddress = () => {
+				return address;
+			};
+			
+			let eventMap = {};
+			
+			let contract;
+			if (checkWalletEnable() === true) {
+				
+				contract = web3.eth.contract(abi).at(address);
+				
+				// 계약의 이벤트 핸들링
+				contract.allEvents((error, info) => {
+					
+					console.log(error, info);
+					
+					if (error === TO_DELETE) {
+						
+						let eventHandlers = eventMap[info.event];
+						
+						if (eventHandlers !== undefined) {
+							EACH(eventHandlers, (eventHandler) => {
+								eventHandler(info.args);
+							});
+						}
+					}
+				});
+				
+				// 함수 분석 및 생성
+				EACH(abi, (funcInfo) => {
+					if (funcInfo.type === 'function') {
+						
+						self[funcInfo.name] = (params, callbackOrHandlers) => {
+							
+							// 콜백만 입력된 경우
+							if (callbackOrHandlers === undefined) {
+								callbackOrHandlers = params;
+								params = undefined;
+							}
+							
+							let callback;
+							let transactionAddressCallback;
+							let errorHandler;
+							
+							// 콜백 정리
+							if (CHECK_IS_DATA(callbackOrHandlers) !== true) {
+								callback = callbackOrHandlers;
+							} else {
+								callback = callbackOrHandlers.success;
+								transactionAddressCallback = callbackOrHandlers.transactionAddress;
+								errorHandler = callbackOrHandlers.error;
+							}
+							
+							let args = [];
+							
+							// 파라미터가 없거나 1개인 경우
+							if (funcInfo.payable !== true && funcInfo.inputs.length <= 1) {
+								args.push(params);
+							}
+							
+							// 파라미터가 여러개인 경우
+							else {
+								
+								let paramsArray = [];
+								EACH(params, (param) => {
+									paramsArray.push(param);
+								});
+								
+								EACH(funcInfo.inputs, (input, i) => {
+									if (input.name !== '') {
+										args.push(params[input.name]);
+									} else {
+										args.push(paramsArray[i]);
+									}
+								});
+							}
+							
+							// 이더 추가
+							if (funcInfo.payable === true) {
+								args.push({
+									value : web3.toWei(params.ether, 'ether')
+								});
+							}
+							
+							// 콜백 추가
+							args.push((error, result) => {
+								
+								// 계약 실행 오류 발생
+								if (error !== TO_DELETE) {
+									if (errorHandler !== undefined) {
+										errorHandler(error.toString());
+									} else {
+										SHOW_ERROR(funcInfo.name, error.toString(), params);
+									}
+								}
+								
+								// 정상 작동
+								else {
+									
+									// constant 함수인 경우
+									if (funcInfo.constant === true) {
+										
+										if (callback !== undefined) {
+											
+											// output이 없는 경우
+											if (funcInfo.outputs.length === 0) {
+												callback();
+											}
+											
+											// output이 1개인 경우
+											else if (funcInfo.outputs.length === 1) {
+												result = cleanResult(funcInfo.outputs, result);
+												callback(result.value, result.str);
+											}
+											
+											// output이 여러개인 경우
+											else if (funcInfo.outputs.length > 1) {
+												result = cleanResult(funcInfo.outputs, result);
+												callback.apply(TO_DELETE, result.array);
+											}
+										}
+									}
+									
+									// 트랜잭션이 필요한 함수인 경우
+									else {
+										
+										if (transactionAddressCallback !== undefined) {
+											transactionAddressCallback(result);
+										}
+										
+										if (callback !== undefined) {
+											
+											let retry = RAR(() => {
+												
+												web3.eth.getTransactionReceipt(result, (error, result) => {
+													
+													// 트랜잭선 오류 발생
+													if (error !== TO_DELETE) {
+														if (errorHandler !== undefined) {
+															errorHandler(error.toString());
+														} else {
+															SHOW_ERROR(funcInfo.name, error.toString(), params);
+														}
+													}
+													
+													// 아무런 값이 없으면 재시도
+													else if (result === TO_DELETE || result.blockHash === TO_DELETE) {
+														retry();
+													}
+													
+													// 트랜잭션 완료
+													else {
+														callback();
+													}
+												});
+											});
+										}
+									}
+								}
+							});
+							
+							contract[funcInfo.name].apply(contract, args);
+						};
+					}
+				});
+			}
+			
+			// UPPERCASE-ROOM 기능을 사용하여 클라이언트에서 web3를 지원하지 않더라도 서버를 통해 정보를 받아오도록 합니다.
+			else if (global.UPPERCASE !== undefined && UPPERCASE.ROOM !== undefined) {
+				
+				let room = UPPERCASE.ROOM('__Contract2Object/' + address);
+				
+				// 함수 분석 및 생성
+				EACH(abi, (funcInfo) => {
+					if (funcInfo.type === 'function') {
+						
+						self[funcInfo.name] = (params, callbackOrHandlers) => {
+							
+							// 콜백만 입력된 경우
+							if (callbackOrHandlers === undefined) {
+								callbackOrHandlers = params;
+								params = undefined;
+							}
+							
+							let callback;
+							let transactionAddressCallback;
+							let errorHandler;
+							
+							// 콜백 정리
+							if (CHECK_IS_DATA(callbackOrHandlers) !== true) {
+								callback = callbackOrHandlers;
+							} else {
+								callback = callbackOrHandlers.success;
+								transactionAddressCallback = callbackOrHandlers.transactionAddress;
+								errorHandler = callbackOrHandlers.error;
+							}
+							
+							let args = [];
+							
+							// 파라미터가 없거나 1개인 경우
+							if (funcInfo.payable !== true && funcInfo.inputs.length <= 1) {
+								args.push(params);
+							}
+							
+							// 파라미터가 여러개인 경우
+							else {
+								
+								let paramsArray = [];
+								EACH(params, (param) => {
+									paramsArray.push(param);
+								});
+								
+								EACH(funcInfo.inputs, (input, i) => {
+									if (input.name !== '') {
+										args.push(params[input.name]);
+									} else {
+										args.push(paramsArray[i]);
+									}
+								});
+							}
+							
+							// 이더 추가
+							if (funcInfo.payable === true) {
+								args.push(web3.toWei(params.ether, 'ether'));
+							}
+							
+							// 콜백 추가
+							args.push();
+							
+							room.send({
+								methodName : funcInfo.name,
+								data : params
+							}, (result) => {
+								
+								// constant 함수인 경우
+								if (funcInfo.constant === true) {
+									
+									if (callback !== undefined) {
+										
+										// output이 없는 경우
+										if (funcInfo.outputs.length === 0) {
+											callback();
+										}
+										
+										// output이 1개인 경우
+										else if (funcInfo.outputs.length === 1) {
+											callback(result.value, result.str);
+										}
+										
+										// output이 여러개인 경우
+										else if (funcInfo.outputs.length > 1) {
+											callback.apply(TO_DELETE, result.array);
+										}
+									}
+								}
+								
+								// 트랜잭션이 필요한 함수인 경우
+								else {
+									// 실행 불가
+								}
+							});
+						};
+					}
+				});
+			}
+			
+			// 이벤트 핸들러를 등록합니다.
+			let on = self.on = (eventName, eventHandler) => {
+				//REQUIRED: eventName
+				//REQUIRED: eventHandler
+				
+				if (eventMap[eventName] === undefined) {
+					eventMap[eventName] = [];
+				}
+	
+				eventMap[eventName].push(eventHandler);
+			};
+			
+			// 이벤트 핸들러를 제거합니다.
+			let off = self.off = (eventName, eventHandler) => {
+				//REQUIRED: eventName
+				//OPTIONAL: eventHandler
+	
+				if (eventMap[eventName] !== undefined) {
+	
+					if (eventHandler !== undefined) {
+	
+						REMOVE({
+							array: eventMap[eventName],
+							value: eventHandler
+						});
+					}
+	
+					if (eventHandler === undefined || eventMap[eventName].length === 0) {
+						delete eventMap[eventName];
+					}
+				}
+			};
+		}
+	};
+});

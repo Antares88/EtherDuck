@@ -13,12 +13,12 @@ contract ArticleController is ArticleControllerInterface {
 		uint lastUpdateTime;
 	}
 	
-	Article[] private articles;
+	Article[] public articles;
 	
 	mapping(address => uint[]) private writerToArticleIds;
 	mapping(string => uint[]) private categoryToArticleIds;
 	
-	function write(string calldata category, string calldata title, string calldata content) external {
+	function write(string calldata category, string calldata title, string calldata content) external returns (uint) {
 		
 		uint writeTime = now;
 		
@@ -35,6 +35,8 @@ contract ArticleController is ArticleControllerInterface {
 		categoryToArticleIds[category].push(articleId);
 		
 		emit Write(msg.sender, category, title, content, writeTime);
+		
+		return articleId;
 	}
 	
 	function read(uint articleId) external view returns (address writer, string memory category, string memory title, string memory content, uint writeTime, uint lastUpdateTime) {
@@ -65,6 +67,10 @@ contract ArticleController is ArticleControllerInterface {
 		delete articles[articleId];
 		
 		emit Remove(articleId);
+	}
+	
+	function getArticleCount() external view returns (uint) {
+		return articles.length;
 	}
 	
 	function getArticleIdsByWriter(address writer) external view returns (uint[] memory) {

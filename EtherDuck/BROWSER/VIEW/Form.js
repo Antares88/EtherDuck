@@ -6,16 +6,19 @@ EtherDuck.Form = CLASS({
 
 	init : (inner, self) => {
 		
+		let cacheStore = EtherDuck.STORE('articleCache');
+		
 		inner.on('paramsChange', (params) => {
 			
 			let articleId = params.articleId;
+			let category = params.category;
 			
 			NEXT([
 			(next) => {
 				
 				// 글 작성
 				if (articleId === undefined) {
-					next();
+					next(undefined, category === undefined ? cacheStore.get('category') : category, cacheStore.get('title'), cacheStore.get('content'));
 				}
 				
 				// 글 수정
@@ -85,10 +88,29 @@ EtherDuck.Form = CLASS({
 							},
 							name : 'category',
 							value : category,
-							options : [OPTION({
-								value : 'etherduck.com/freeboard',
-								c : '자유게시판'
-							})]
+							options : RUN(() => {
+								
+								let options = [];
+								
+								EACH(EtherDuck.CategoryManager.getCategories(), (category) => {
+									options.push(OPTION({
+										value : 'etherduck.com/' + category,
+										c : EtherDuck.CategoryManager.getTitle(category)
+									}));
+								});
+								
+								return options;
+							}),
+							on : {
+								change : (e, select) => {
+									if (articleId === undefined) {
+										cacheStore.save({
+											name : 'category',
+											value : select.getValue()
+										});
+									}
+								}
+							}
 						}),
 						
 						Yogurt.Input({
@@ -97,7 +119,17 @@ EtherDuck.Form = CLASS({
 							},
 							name : 'title',
 							value : title,
-							placeholder : '글 제목'
+							placeholder : '글 제목',
+							on : {
+								keyup : (e, input) => {
+									if (articleId === undefined) {
+										cacheStore.save({
+											name : 'title',
+											value : input.getValue()
+										});
+									}
+								}
+							}
 						}),
 						
 						Yogurt.Textarea({
@@ -110,10 +142,18 @@ EtherDuck.Form = CLASS({
 							placeholder : '글 내용',
 							on : {
 								keyup : (e, textarea) => {
+									
 									Markdown.MarkUpDOM({
 										dom : preview,
 										md : textarea.getValue()
 									});
+									
+									if (articleId === undefined) {
+										cacheStore.save({
+											name : 'content',
+											value : textarea.getValue()
+										});
+									}
 								},
 								change : (e, textarea) => {
 									
@@ -186,7 +226,7 @@ EtherDuck.Form = CLASS({
 												transactionAddress : (transactionAddress) => {
 													
 													Yogurt.Alert({
-														msg : ['트랜잭션이 등록되었습니다. 트랜잭션이 완료되면, 자동으로 글이 나타납니다.', BR(), A({
+														msg : ['트랜잭션이 등록되었습니다.', BR(), A({
 															style : {
 																color : '#ffcc00',
 																fontWeight : 'bold'
@@ -198,6 +238,8 @@ EtherDuck.Form = CLASS({
 													});
 													
 													EtherDuck.GO(data.category.substring('etherduck.com/'.length));
+													
+													cacheStore.clear();
 												},
 												
 												success : () => {
@@ -216,7 +258,7 @@ EtherDuck.Form = CLASS({
 												transactionAddress : (transactionAddress) => {
 													
 													Yogurt.Alert({
-														msg : ['트랜잭션이 등록되었습니다. 트랜잭션이 완료되면, 자동으로 글이 나타납니다.', BR(), A({
+														msg : ['트랜잭션이 등록되었습니다.', BR(), A({
 															style : {
 																color : '#ffcc00',
 																fontWeight : 'bold'

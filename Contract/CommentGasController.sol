@@ -1,8 +1,9 @@
 pragma solidity ^0.5.1;
 
+import "./NetworkChecker.sol";
 import "./CommentControllerInterface.sol";
 
-contract CommentController is CommentControllerInterface {
+contract CommentGasController is CommentControllerInterface {
 	
 	struct Comment {
 		address writer;

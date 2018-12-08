@@ -55,89 +55,10 @@ EtherDuck.Category = CLASS({
 				
 				list.empty();
 				
-				EACH(articleIds, (articleId) => {
-					
-					let article;
-					list.append(article = DIV({
-						style : {
-							marginTop : 40
-						}
-					}));
-					
-					EtherDuck.ArticleControllerContract.read(articleId, (writer, category, title, _content, writeTime, lastUpdateTime) => {
-						
-						// 제목
-						article.append(H3({
-							style : {
-								fontSize : 20,
-								fontWeight : 'bold'
-							},
-							c : A({
-								c : title,
-								on : {
-									tap : () => {
-										EtherDuck.GO('article/' + articleId);
-									}
-								}
-							})
-						}));
-						
-						let content = _content.replace(/\n/g, ' ');
-						
-						// 내용
-						article.append(P({
-							style : {
-								marginTop : 8,
-								color : '#999'
-							},
-							c : A({
-								c : content.length > 130 ? content.substring(0, 130) + '...' : content,
-								on : {
-									tap : () => {
-										EtherDuck.GO('article/' + articleId);
-									}
-								}
-							})
-						}));
-						
-						// 작성자
-						article.append(DIV({
-							style : {
-								marginTop : 12,
-								fontSize : 12
-							},
-							c : [A({
-								c : writer,
-								on : {
-									tap : () => {
-										EtherDuck.GO('writer/' + writer);
-									},
-									mouseover : (e, a) => {
-										a.addStyle({
-											textDecoration : 'underline'
-										});
-									},
-									mouseout : (e, a) => {
-										a.addStyle({
-											textDecoration : 'none'
-										});
-									}
-								}
-							}), ' 님 작성']
-						}));
-						
-						// 작성일
-						let writeTimeCal = CALENDAR(new Date(writeTime * 1000));
-						
-						article.append(DIV({
-							style : {
-								marginTop : 4,
-								fontSize : 12
-							},
-							c : writeTimeCal.getYear(true) + '-' + writeTimeCal.getMonth(true) + '-' + writeTimeCal.getDate(true) + ' ' + writeTimeCal.getHour(true) + ':' + writeTimeCal.getMinute(true)
-						}));
-					});
-				});
+				EtherDuck.ArticleList({
+					articleIds : articleIds.reverse(),
+					category : category
+				}).appendTo(list);
 			});
 		});
 	}

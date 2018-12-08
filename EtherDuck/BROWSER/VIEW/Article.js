@@ -39,6 +39,11 @@ EtherDuck.Article = CLASS({
 			EtherDuck.ArticleControllerContract.read(articleId, (writer, fullCategory, title, content, writeTime, lastUpdateTime) => {
 				article.empty();
 				
+				if (writer === '0x0000000000000000000000000000000000000000') {
+					title = '삭제된 글';
+					content = '삭제된 글입니다.';
+				}
+				
 				TITLE('이더덕 :: ' + title);
 				
 				// 제목
@@ -79,41 +84,44 @@ EtherDuck.Article = CLASS({
 				}));
 				
 				// 작성자
-				article.append(DIV({
-					style : {
-						marginTop : 30,
-						fontSize : 14
-					},
-					c : [A({
-						c : writer,
-						on : {
-							tap : () => {
-								EtherDuck.GO('writer/' + writer);
-							},
-							mouseover : (e, a) => {
-								a.addStyle({
-									textDecoration : 'underline'
-								});
-							},
-							mouseout : (e, a) => {
-								a.addStyle({
-									textDecoration : 'none'
-								});
+				if (writer !== '0x0000000000000000000000000000000000000000') {
+					
+					article.append(DIV({
+						style : {
+							marginTop : 30,
+							fontSize : 14
+						},
+						c : [A({
+							c : writer,
+							on : {
+								tap : () => {
+									EtherDuck.GO('writer/' + writer);
+								},
+								mouseover : (e, a) => {
+									a.addStyle({
+										textDecoration : 'underline'
+									});
+								},
+								mouseout : (e, a) => {
+									a.addStyle({
+										textDecoration : 'none'
+									});
+								}
 							}
-						}
-					}), ' 님 작성']
-				}));
-				
-				// 작성일
-				let writeTimeCal = CALENDAR(new Date(writeTime * 1000));
-				
-				article.append(DIV({
-					style : {
-						marginTop : 4,
-						fontSize : 14
-					},
-					c : writeTimeCal.getYear(true) + '-' + writeTimeCal.getMonth(true) + '-' + writeTimeCal.getDate(true) + ' ' + writeTimeCal.getHour(true) + ':' + writeTimeCal.getMinute(true)
-				}));
+						}), ' 님 작성']
+					}));
+					
+					// 작성일
+					let writeTimeCal = CALENDAR(new Date(writeTime * 1000));
+					
+					article.append(DIV({
+						style : {
+							marginTop : 4,
+							fontSize : 14
+						},
+						c : writeTimeCal.getYear(true) + '-' + writeTimeCal.getMonth(true) + '-' + writeTimeCal.getDate(true) + ' ' + writeTimeCal.getHour(true) + ':' + writeTimeCal.getMinute(true)
+					}));
+				}
 				
 				// 글 내용
 				let markdown;
@@ -189,7 +197,7 @@ EtherDuck.Article = CLASS({
 										transactionAddress : (transactionAddress) => {
 											
 											Yogurt.Alert({
-												msg : ['트랜잭션이 등록되었습니다. 트랜잭션이 완료되면, 자동으로 글이 나타납니다.', BR(), A({
+												msg : ['트랜잭션이 등록되었습니다.', BR(), A({
 													style : {
 														color : '#ffcc00',
 														fontWeight : 'bold'
