@@ -20,6 +20,11 @@ EtherDuck.MAIN = METHOD({
 		});
 		
 		EtherDuck.MATCH_VIEW({
+			uri : 'writer/{writer}',
+			target : EtherDuck.Writer
+		});
+		
+		EtherDuck.MATCH_VIEW({
 			uri : 'write',
 			target : EtherDuck.Form
 		});

@@ -1,4 +1,4 @@
-EtherDuck.Category = CLASS({
+EtherDuck.Writer = CLASS({
 
 	preset : () => {
 		return VIEW;
@@ -8,11 +8,9 @@ EtherDuck.Category = CLASS({
 		
 		inner.on('paramsChange', (params) => {
 			
-			let category = params.category;
+			let writer = params.writer;
 			
-			let title = EtherDuck.CategoryManager.getTitle(category);
-			
-			TITLE('이더덕 :: ' + title);
+			TITLE('이더덕 :: ' + writer + ' 님의 글 목록');
 			
 			let list;
 			EtherDuck.Layout.setContent(DIV({
@@ -33,12 +31,12 @@ EtherDuck.Category = CLASS({
 				},
 				c : [H1({
 					style : {
-						fontSize : 30,
+						fontSize : 20,
 						fontWeight : 'bold',
 						borderBottom : '1px solid #eee',
 						paddingBottom : 30
 					},
-					c : title
+					c : writer + ' 님의 글 목록'
 				}), list = DIV({
 					c : P({
 						style : {
@@ -51,7 +49,7 @@ EtherDuck.Category = CLASS({
 				})]
 			}));
 			
-			EtherDuck.ArticleControllerContract.getArticleIdsByCategory('etherduck.com/' + category, (articleIds) => {
+			EtherDuck.ArticleControllerContract.getArticleIdsByWriter(writer, (articleIds) => {
 				
 				list.empty();
 				
@@ -64,7 +62,9 @@ EtherDuck.Category = CLASS({
 						}
 					}));
 					
-					EtherDuck.ArticleControllerContract.read(articleId, (writer, category, title, _content, writeTime, lastUpdateTime) => {
+					EtherDuck.ArticleControllerContract.read(articleId, (writer, fullCategory, title, _content, writeTime, lastUpdateTime) => {
+						
+						let category = fullCategory.substring('etherduck.com/'.length);
 						
 						// 제목
 						article.append(H3({
@@ -72,14 +72,36 @@ EtherDuck.Category = CLASS({
 								fontSize : 20,
 								fontWeight : 'bold'
 							},
-							c : A({
+							c : [A({
+								style : {
+									fontSize : 14,
+									color : '#666',
+									fontWeight : 'normal'
+								},
+								c : EtherDuck.CategoryManager.getTitle(category),
+								on : {
+									tap : () => {
+										EtherDuck.GO(category);
+									},
+									mouseover : (e, a) => {
+										a.addStyle({
+											textDecoration : 'underline'
+										});
+									},
+									mouseout : (e, a) => {
+										a.addStyle({
+											textDecoration : 'none'
+										});
+									}
+								}
+							}), BR(), A({
 								c : title,
 								on : {
 									tap : () => {
 										EtherDuck.GO('article/' + articleId);
 									}
 								}
-							})
+							})]
 						}));
 						
 						let content = _content.replace(/\n/g, ' ');
@@ -106,24 +128,7 @@ EtherDuck.Category = CLASS({
 								marginTop : 12,
 								fontSize : 12
 							},
-							c : [A({
-								c : writer,
-								on : {
-									tap : () => {
-										EtherDuck.GO('writer/' + writer);
-									},
-									mouseover : (e, a) => {
-										a.addStyle({
-											textDecoration : 'underline'
-										});
-									},
-									mouseout : (e, a) => {
-										a.addStyle({
-											textDecoration : 'none'
-										});
-									}
-								}
-							}), ' 님 작성']
+							c : writer + ' 님 작성'
 						}));
 						
 						// 작성일

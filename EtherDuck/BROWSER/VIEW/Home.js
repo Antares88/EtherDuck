@@ -138,7 +138,24 @@ EtherDuck.Home = CLASS({
 									marginTop : 12,
 									fontSize : 12
 								},
-								c : writer + ' 님 작성'
+								c : [A({
+									c : writer,
+									on : {
+										tap : () => {
+											EtherDuck.GO('writer/' + writer);
+										},
+										mouseover : (e, a) => {
+											a.addStyle({
+												textDecoration : 'underline'
+											});
+										},
+										mouseout : (e, a) => {
+											a.addStyle({
+												textDecoration : 'none'
+											});
+										}
+									}
+								}), ' 님 작성']
 							}));
 							
 							// 작성일
