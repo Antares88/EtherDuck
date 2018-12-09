@@ -32,7 +32,9 @@ EtherDuck.Article = CLASS({
 						fontSize : 14,
 						color : '#999'
 					},
-					c : '글 내용을 불러오는 중입니다...'
+					c : [IMG({
+						src : 'EtherDuck/R/loading.gif'
+					}), ' 글 내용을 불러오는 중입니다...']
 				})
 			}));
 			
@@ -468,7 +470,9 @@ EtherDuck.Article = CLASS({
 									fontSize : 14,
 									color : '#999'
 								},
-								c : '댓글 목록을 불러오는 중입니다...'
+								c : [IMG({
+									src : 'EtherDuck/R/loading.gif'
+								}), ' 댓글 목록을 불러오는 중입니다...']
 							})
 						}), cachedCommentList = DIV(), FORM({
 							style : {

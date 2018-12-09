@@ -215,7 +215,9 @@ EtherDuck.Form = CLASS({
 											
 											let loading;
 											input.after(loading = DIV({
-												c : 'IFPS로 파일 업로드 중입니다...'
+												c : [IMG({
+													src : 'EtherDuck/R/loading.gif'
+												}), ' IFPS로 파일 업로드 중입니다...']
 											}));
 											
 											EtherDuck.IPFSManager.upload(file, (hash) => {
