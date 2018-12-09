@@ -6,6 +6,70 @@ EtherDuck.Article = CLASS({
 
 	init : (inner, self) => {
 		
+		const URL_REGEX = /(http|https|ftp|telnet|news|mms):\/[^\"\'\s()]+/i;
+		
+		const replaceLink = (content) => {
+			
+			let children = [];
+			
+			EACH(content.split(' '), (content, i) => {
+				
+				if (i > 0) {
+					children.push(' ');
+				}
+				
+				// 링크를 찾아 교체합니다.
+				let replaceLink = () => {
+					
+					let match = content.match(URL_REGEX);
+					if (match === TO_DELETE) {
+						children.push(content);
+					}
+					
+					else {
+						
+						let url = match[0];
+						if (url.indexOf(' ') !== -1) {
+							url = url.substring(0, url.indexOf(' '));
+						}
+						
+						let index = content.indexOf(url);
+						
+						children.push(content.substring(0, index));
+						
+						content = content.substring(index + url.length);
+						
+						children.push(A({
+							style : {
+								color : '#4183c4'
+							},
+							target : '_blank',
+							href : url,
+							c : url,
+							on : {
+								mouseover : (e, a) => {
+									a.addStyle({
+										textDecoration : 'underline'
+									});
+								},
+								mouseout : (e, a) => {
+									a.addStyle({
+										textDecoration : 'none'
+									});
+								}
+							}
+						}));
+						
+						replaceLink();
+					}
+				};
+				
+				replaceLink();
+			});
+			
+			return children;
+		};
+		
 		inner.on('paramsChange', (params) => {
 			
 			let articleId = INTEGER(params.articleId);
@@ -614,7 +678,7 @@ EtherDuck.Article = CLASS({
 										style : {
 											flt : 'left'
 										},
-										c : content
+										c : replaceLink(content)
 									}));
 									
 									// 수정 및 삭제
@@ -802,7 +866,7 @@ EtherDuck.Article = CLASS({
 																	content = contentToUpdate;
 																	
 																	contentWrapper.empty();
-																	contentWrapper.append(content);
+																	contentWrapper.append(replaceLink(content));
 																	
 																	EtherDuck.CommentCacheManager.updateCache({
 																		commentId : commentId,
