@@ -165,6 +165,19 @@ EtherDuck.Form = CLASS({
 							}
 						}),
 						
+						INPUT({
+							type : 'file',
+							on : {
+								change : (e, input) => {
+									let file = input.getEl().files[0];
+									
+									console.log(file);
+									
+									EtherDuck.IPFSNodeManager.upload(file);
+								}
+							}
+						}),
+						
 						Yogurt.Submit({
 							style : {
 								marginTop : 20

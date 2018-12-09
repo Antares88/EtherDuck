@@ -22,6 +22,8 @@
             	JavaScript is disabled. Please enable JavaScript in your browser.
             </p>
         </noscript>
+		<script src="web3.min.js"></script>
+		<script src="https://unpkg.com/ipfs/dist/index.min.js"></script>
 		<script src="UPPERCASE-CORE/BROWSER.js"></script>
 		<!-- BOX -->
 		<script>BOX('Contract2Object');</script>
@@ -50,6 +52,7 @@
 		<script src="EtherDuck/BROWSER/Contract/CommentControllerContract.js"></script>
 		<script src="EtherDuck/BROWSER/Contract/LikeControllerContract.js"></script>
 		<script src="EtherDuck/BROWSER/Manager/CategoryManager.js"></script>
+		<script src="EtherDuck/BROWSER/Manager/IPFSNodeManager.js"></script>
 		<script>
 		RUN(() => {
 			if (location.search !== '') {
@@ -73,6 +76,9 @@
 			
 			CONFIG.defaultBoxName = 'EtherDuck';
 			CONFIG.isTestnetMode = true;
+			
+			BROWSER_CONFIG.infuraServerName = 'kovan';
+			BROWSER_CONFIG.infuraProjectId = 'af289fa108bf4d039e4c699573a02e2c';
 			
 			FOR_BOX((box) => {
 				if (box.OVERRIDE !== undefined) {

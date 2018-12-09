@@ -3,8 +3,9 @@ global.Contract2Object = CLASS((cls) => {
 	let isWeb3Enable = false;
 	
 	// Web3 체크
-	if (typeof global.web3 !== 'undefined') {
+	if (global.web3 !== undefined) {
 		global.web3 = new Web3(global.web3.currentProvider);
+		console.log(global.web3.currentProvider);
 		isWeb3Enable = true;
 	}
 	
@@ -156,6 +157,24 @@ global.Contract2Object = CLASS((cls) => {
 			//REQUIRED: params.abi
 			//REQUIRED: params.address
 			
+			//global.web3 = undefined;
+			if (global.web3 === undefined && BROWSER_CONFIG.infuraProjectId !== undefined) {
+				
+				let getProvider = () => {
+						
+					let provider = new Web3.providers.WebsocketProvider('wss://' + (BROWSER_CONFIG.infuraServerName === undefined ? 'mainnet' : BROWSER_CONFIG.infuraServerName) + '.infura.io/ws/v3/' + BROWSER_CONFIG.infuraProjectId);
+					provider.on('end', (e) => {
+						SHOW_ERROR('Contract2Object', 'WebsocketProvider의 접속이 끊어졌습니다. 재접속합니다.');
+						web3.setProvider(getProvider());
+					});
+					
+					return provider;
+				};
+				
+				global.web3 = new Web3(getProvider());
+				isWeb3Enable = true;
+			}
+			
 			let abi = params.abi;
 			let address = params.address;
 			
@@ -168,20 +187,18 @@ global.Contract2Object = CLASS((cls) => {
 			let contract;
 			if (checkWalletEnable() === true) {
 				
-				contract = web3.eth.contract(abi).at(address);
+				contract = new web3.eth.Contract(abi, address);
 				
 				// 계약의 이벤트 핸들링
-				contract.allEvents((error, info) => {
-					
-					console.log(error, info);
+				contract.events.allEvents((error, info) => {
 					
 					if (error === TO_DELETE) {
 						
 						let eventHandlers = eventMap[info.event];
-						
+			
 						if (eventHandlers !== undefined) {
 							EACH(eventHandlers, (eventHandler) => {
-								eventHandler(info.args);
+								eventHandler(info.returnValues);
 							});
 						}
 					}
@@ -214,9 +231,11 @@ global.Contract2Object = CLASS((cls) => {
 							
 							let args = [];
 							
-							// 파라미터가 없거나 1개인 경우
+							// 파라미터가 파라미터가 없거나 1개인 경우
 							if (funcInfo.payable !== true && funcInfo.inputs.length <= 1) {
-								args.push(params);
+								if (funcInfo.inputs.length !== 0) {
+									args.push(params);
+								}
 							}
 							
 							// 파라미터가 여러개인 경우
@@ -236,15 +255,8 @@ global.Contract2Object = CLASS((cls) => {
 								});
 							}
 							
-							// 이더 추가
-							if (funcInfo.payable === true) {
-								args.push({
-									value : web3.toWei(params.ether, 'ether')
-								});
-							}
-							
-							// 콜백 추가
-							args.push((error, result) => {
+							// 함수 실행
+							contract.methods[funcInfo.name].apply(contract.methods, args).call((error, result) => {
 								
 								// 계약 실행 오류 발생
 								if (error !== TO_DELETE) {
@@ -319,8 +331,6 @@ global.Contract2Object = CLASS((cls) => {
 									}
 								}
 							});
-							
-							contract[funcInfo.name].apply(contract, args);
 						};
 					}
 				});
