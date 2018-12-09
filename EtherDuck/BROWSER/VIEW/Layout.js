@@ -7,6 +7,11 @@ EtherDuck.Layout = CLASS((cls) => {
 		menuLayoutContent.append(content);
 	};
 	
+	let nowCategory;
+	let setNowCategory = cls.setNowCategory = (category) => {
+		nowCategory = category;
+	};
+	
 	return {
 		
 		preset : () => {
@@ -47,7 +52,7 @@ EtherDuck.Layout = CLASS((cls) => {
 						icon : FontAwesome.GetIcon('pen'),
 						on : {
 							tap : () => {
-								EtherDuck.GO('write');
+								EtherDuck.GO(nowCategory === undefined ? 'write' : 'write/' + nowCategory);
 							}
 						}
 					})

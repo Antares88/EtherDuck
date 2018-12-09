@@ -8,6 +8,8 @@ EtherDuck.Home = CLASS({
 		
 		TITLE('이더덕 :: 이더리움 덕후 게시판');
 		
+		EtherDuck.Layout.setNowCategory(undefined);
+		
 		let list;
 		EtherDuck.Layout.setContent(DIV({
 			style : {

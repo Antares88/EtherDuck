@@ -25,7 +25,7 @@ EtherDuck.MAIN = METHOD({
 		});
 		
 		EtherDuck.MATCH_VIEW({
-			uri : 'write',
+			uri : ['write', 'write/{category}'],
 			target : EtherDuck.Form
 		});
 		
@@ -37,6 +37,11 @@ EtherDuck.MAIN = METHOD({
 		EtherDuck.MATCH_VIEW({
 			uri : 'article/{articleId}',
 			target : EtherDuck.Article
+		});
+		
+		EtherDuck.MATCH_VIEW({
+			uri : 'articlecache',
+			target : EtherDuck.ArticleCache
 		});
 		
 		EtherDuck.MATCH_VIEW({

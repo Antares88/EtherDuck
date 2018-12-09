@@ -18,11 +18,13 @@ EtherDuck.Form = CLASS({
 				
 				// 글 작성
 				if (articleId === undefined) {
-					next(undefined, category === undefined ? cacheStore.get('category') : category, cacheStore.get('title'), cacheStore.get('content'));
+					next(undefined, category === undefined ? cacheStore.get('category') : 'etherduck.com/' + category, cacheStore.get('title'), cacheStore.get('content'));
 				}
 				
 				// 글 수정
 				else {
+					
+					articleId = INTEGER(articleId);
 					
 					EtherDuck.Layout.setContent(DIV({
 						style : {
@@ -51,6 +53,24 @@ EtherDuck.Form = CLASS({
 			
 			() => {
 				return (writer, category, title, content, writeTime, lastUpdateTime) => {
+					
+					if (articleId !== undefined) {
+						
+						EtherDuck.ArticleCacheManager.updateDone({
+							articleId : articleId,
+							category : category,
+							title : title,
+							content : content
+						});
+						
+						let updateCache = EtherDuck.ArticleCacheManager.getUpdateCache(articleId);
+						
+						if (updateCache !== undefined) {
+							category = updateCache.category;
+							title = updateCache.title;
+							content = updateCache.content;
+						}
+					}
 					
 					let preview;
 					let textarea;
@@ -215,7 +235,7 @@ EtherDuck.Form = CLASS({
 							style : {
 								marginTop : 20
 							},
-							value : '작성 완료'
+							value : articleId === undefined ? '작성 완료' : '수정 완료'
 						}),
 						
 						DIV({
@@ -283,13 +303,32 @@ EtherDuck.Form = CLASS({
 														})]
 													});
 													
-													EtherDuck.GO(data.category.substring('etherduck.com/'.length));
-													
 													cacheStore.clear();
+													
+													Contract2Object.getWalletAddress((walletAddress) => {
+														EtherDuck.ArticleCacheManager.writeCache({
+															writer : walletAddress,
+															category : data.category,
+															title : data.title,
+															content : data.content
+														});
+													});
+													
+													EtherDuck.GO(data.category.substring('etherduck.com/'.length));
 												},
 												
-												success : () => {
-													//TODO:
+												error : (errorMsg) => {
+													
+													Contract2Object.getWalletAddress((walletAddress) => {
+														EtherDuck.ArticleCacheManager.writeDone({
+															writer : walletAddress,
+															category : data.category,
+															title : data.title,
+															content : data.content
+														});
+													});
+													
+													SHOW_ERROR('ArticleControllerContract.write', errorMsg, data);
 												}
 											});
 										}
@@ -315,11 +354,26 @@ EtherDuck.Form = CLASS({
 														})]
 													});
 													
-													EtherDuck.GO(data.category.substring('etherduck.com/'.length));
+													EtherDuck.ArticleCacheManager.updateCache({
+														articleId : articleId,
+														category : data.category,
+														title : data.title,
+														content : data.content
+													});
+													
+													EtherDuck.GO('article/' + articleId);
 												},
 												
-												success : () => {
-													//TODO:
+												error : (errorMsg) => {
+													
+													EtherDuck.ArticleCacheManager.updateDone({
+														articleId : articleId,
+														category : data.category,
+														title : data.title,
+														content : data.content
+													});
+													
+													SHOW_ERROR('ArticleControllerContract.update', errorMsg, data);
 												}
 											});
 										}

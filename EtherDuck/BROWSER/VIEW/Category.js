@@ -10,6 +10,8 @@ EtherDuck.Category = CLASS({
 			
 			let category = params.category;
 			
+			EtherDuck.Layout.setNowCategory(category);
+			
 			let title = EtherDuck.CategoryManager.getTitle(category);
 			
 			TITLE('이더덕 :: ' + title);

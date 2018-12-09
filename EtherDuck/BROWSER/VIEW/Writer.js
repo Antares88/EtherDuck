@@ -12,6 +12,8 @@ EtherDuck.Writer = CLASS({
 			
 			TITLE('이더덕 :: ' + writer + ' 님의 글 목록');
 			
+			EtherDuck.Layout.setNowCategory(undefined);
+			
 			let list;
 			EtherDuck.Layout.setContent(DIV({
 				style : {
