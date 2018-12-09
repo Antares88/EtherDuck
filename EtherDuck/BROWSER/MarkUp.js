@@ -25,7 +25,7 @@ EtherDuck.MarkUp = METHOD({
 			let ipfsHash = ipfsMatch[1];
 			let type = ipfsMatch[2];
 			
-			html = html.substring(0, ipfsMatch.index) + '<div class="ipfs-' + ipfsHash + '"><img src="/EtherDuck/R/loading.gif"> IFPS로 부터 파일 정보를 불러오는 중입니다...</div>' + html.substring(ipfsMatch.index + ipfsMatch[0].length);
+			html = html.substring(0, ipfsMatch.index) + '<div class="ipfs-' + ipfsHash + '"><img src="/EtherDuck/R/loading.gif"> IPFS로 부터 파일 정보를 불러오는 중입니다...</div>' + html.substring(ipfsMatch.index + ipfsMatch[0].length);
 			
 			ipfsHashes[ipfsHash] = type;
 		}
