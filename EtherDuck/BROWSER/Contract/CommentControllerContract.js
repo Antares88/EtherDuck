@@ -10,7 +10,7 @@ EtherDuck.CommentControllerContract = OBJECT({
 			address : CONFIG.isTestnetMode !== true ?
 			
 			// 운영 모드
-			'0xe76db8bef5f77313bc21047b22c054de41575566' :
+			'0x8210677fbad56ff5ceadf2e222e1c9228c74bc95' :
 			
 			// 개발 모드
 			// Kovan

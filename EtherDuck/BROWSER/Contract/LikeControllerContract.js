@@ -10,7 +10,7 @@ EtherDuck.LikeControllerContract = OBJECT({
 			address : CONFIG.isTestnetMode !== true ?
 			
 			// 운영 모드
-			'0xe76db8bef5f77313bc21047b22c054de41575566' :
+			'0xffe37788bc285046c23d89e5d2e502c450024f00' :
 			
 			// 개발 모드
 			// Kovan
