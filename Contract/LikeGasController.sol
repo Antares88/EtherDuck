@@ -5,7 +5,7 @@ import "./LikeControllerInterface.sol";
 contract LikeGasController is LikeControllerInterface {
 	
 	struct GasInfo {
-		address writer;
+		address voter;
 		string behavior;
 		uint gasUsed;
 	}
@@ -31,7 +31,7 @@ contract LikeGasController is LikeControllerInterface {
 		targetToLikeCount[target] = targetToLikeCount[target].add(1);
 		
 		gasInfos.push(GasInfo({
-			writer : msg.sender,
+			voter : msg.sender,
 			behavior : 'like',
 			gasUsed : startGas - gasleft()
 		}));
@@ -50,7 +50,7 @@ contract LikeGasController is LikeControllerInterface {
 		targetToDislikeCount[target] = targetToDislikeCount[target].add(1);
 		
 		gasInfos.push(GasInfo({
-			writer : msg.sender,
+			voter : msg.sender,
 			behavior : 'dislike',
 			gasUsed : startGas - gasleft()
 		}));
