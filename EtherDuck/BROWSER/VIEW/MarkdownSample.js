@@ -30,14 +30,15 @@ EtherDuck.MarkdownSample = CLASS({
 				},
 				on : {
 					keyup : (e, textarea) => {
-						Markdown.MarkUpDOM({
+						
+						EtherDuck.MarkUp({
 							dom : content,
 							md : textarea.getValue()
 						});
 					},
 					change : (e, textarea) => {
 						
-						Markdown.MarkUpDOM({
+						EtherDuck.MarkUp({
 							dom : content,
 							md : textarea.getValue()
 						});

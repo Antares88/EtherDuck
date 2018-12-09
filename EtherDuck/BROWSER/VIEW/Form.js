@@ -53,6 +53,7 @@ EtherDuck.Form = CLASS({
 				return (writer, category, title, content, writeTime, lastUpdateTime) => {
 					
 					let preview;
+					let textarea;
 					
 					EtherDuck.Layout.setContent(FORM({
 						style : {
@@ -132,7 +133,7 @@ EtherDuck.Form = CLASS({
 							}
 						}),
 						
-						Yogurt.Textarea({
+						textarea = Yogurt.Textarea({
 							style : {
 								marginTop : 10,
 								height : 300
@@ -143,7 +144,7 @@ EtherDuck.Form = CLASS({
 							on : {
 								keyup : (e, textarea) => {
 									
-									Markdown.MarkUpDOM({
+									EtherDuck.MarkUp({
 										dom : preview,
 										md : textarea.getValue()
 									});
@@ -157,25 +158,57 @@ EtherDuck.Form = CLASS({
 								},
 								change : (e, textarea) => {
 									
-									Markdown.MarkUpDOM({
+									EtherDuck.MarkUp({
 										dom : preview,
 										md : textarea.getValue()
 									});
+									
+									if (articleId === undefined) {
+										cacheStore.save({
+											name : 'content',
+											value : textarea.getValue()
+										});
+									}
 								}
 							}
 						}),
 						
-						INPUT({
-							type : 'file',
-							on : {
-								change : (e, input) => {
-									let file = input.getEl().files[0];
-									
-									console.log(file);
-									
-									EtherDuck.IPFSNodeManager.upload(file);
+						DIV({
+							style : {
+								marginTop : 10,
+								border : '1px solid #ccc',
+								padding : 5
+							},
+							c : INPUT({
+								style : {
+									width : '100%'
+								},
+								type : 'file',
+								on : {
+									change : (e, input) => {
+										
+										if (input.getValue() !== '') {
+											
+											let file = input.getEl().files[0];
+											
+											input.hide();
+											
+											let loading;
+											input.after(loading = DIV({
+												c : 'IFPS로 파일 업로드 중입니다...'
+											}));
+											
+											EtherDuck.IPFSManager.upload(file, (hash) => {
+												textarea.setValue(textarea.getValue() + '[@IPFS:' + hash + ':' + file.type + ']');
+												
+												loading.remove();
+												input.show();
+												input.setValue('');
+											});
+										}
+									}
 								}
-							}
+							})
 						}),
 						
 						Yogurt.Submit({
@@ -297,7 +330,7 @@ EtherDuck.Form = CLASS({
 					}));
 					
 					if (content !== undefined) {
-						Markdown.MarkUpDOM({
+						EtherDuck.MarkUp({
 							dom : preview,
 							md : content
 						});

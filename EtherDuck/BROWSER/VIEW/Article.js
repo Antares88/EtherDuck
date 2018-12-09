@@ -134,7 +134,7 @@ EtherDuck.Article = CLASS({
 					}
 				}));
 				
-				Markdown.MarkUpDOM({
+				EtherDuck.MarkUp({
 					dom : markdown,
 					md : content
 				});

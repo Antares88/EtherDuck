@@ -22,7 +22,6 @@
             	JavaScript is disabled. Please enable JavaScript in your browser.
             </p>
         </noscript>
-		<script src="web3.min.js"></script>
 		<script src="https://unpkg.com/ipfs/dist/index.min.js"></script>
 		<script src="UPPERCASE-CORE/BROWSER.js"></script>
 		<!-- BOX -->
@@ -40,6 +39,7 @@
 		<script>BOX('EtherDuck');</script>
 		<script src="EtherDuck/BROWSER/Yogurt.Theme.js"></script>
 		<script src="EtherDuck/BROWSER/MAIN.js"></script>
+		<script src="EtherDuck/BROWSER/MarkUp.js"></script>
 		<script src="EtherDuck/BROWSER/Component/ArticleList.js"></script>
 		<script src="EtherDuck/BROWSER/VIEW/Layout.js"></script>
 		<script src="EtherDuck/BROWSER/VIEW/Home.js"></script>
@@ -52,7 +52,7 @@
 		<script src="EtherDuck/BROWSER/Contract/CommentControllerContract.js"></script>
 		<script src="EtherDuck/BROWSER/Contract/LikeControllerContract.js"></script>
 		<script src="EtherDuck/BROWSER/Manager/CategoryManager.js"></script>
-		<script src="EtherDuck/BROWSER/Manager/IPFSNodeManager.js"></script>
+		<script src="EtherDuck/BROWSER/Manager/IPFSManager.js"></script>
 		<script>
 		RUN(() => {
 			if (location.search !== '') {
@@ -77,8 +77,18 @@
 			CONFIG.defaultBoxName = 'EtherDuck';
 			CONFIG.isTestnetMode = true;
 			
-			BROWSER_CONFIG.infuraServerName = 'kovan';
+			if (CONFIG.isTestnetMode === true) {
+				BROWSER_CONFIG.infuraServerName = 'kovan';
+			}
 			BROWSER_CONFIG.infuraProjectId = 'af289fa108bf4d039e4c699573a02e2c';
+			
+			let isUsingOldWeb3;
+			if (global.web3 !== undefined && web3.version !== undefined && web3.version.api !== undefined) {
+				if (web3.version.api.substring(0, 2) === '0.') {
+					global.Contract2Object = Contract2ObjectForOldWeb3;
+					isUsingOldWeb3 = true;
+				}
+			}
 			
 			FOR_BOX((box) => {
 				if (box.OVERRIDE !== undefined) {
@@ -93,6 +103,57 @@
 					box.MAIN();
 				}
 			});
+			
+			// 기본 공급자가 없는 경우 알림
+			if (isUsingOldWeb3 !== true && Web3.givenProvider !== undefined) {
+				
+				// 모바일에서
+				if (INFO.getOSName() === 'Android' || INFO.getOSName() === 'iOS') {
+					
+					Yogurt.Alert({
+						msg : P({
+							style : {
+								fontSize : 14
+							},
+							c : [
+								'모바일에서 접속하셨군요! 반갑습니다.\n',
+								'그런데 손님, 이더덕은 이더리움 기반 서비스라 이더리움 네트워크에 연결되야 사용이 가능하답니다! ㅜ.ㅜ\n',
+								'괜찮으시면 ', A({
+									style : {
+										color : '#ffcc00',
+										fontWeight : 'bold'
+									},
+									href : INFO.getOSName() === 'iOS' ? 'https://itunes.apple.com/app/cipher-browser-for-ethereum/id1294572970?ls=1&mt=8' : 'https://play.google.com/store/apps/details?id=com.cipherbrowser.cipher',
+									c : 'Cipher Browser'
+								}) ,'를 다운로드받아 사용해 보시겠어요?'
+							]
+						})
+					});
+				}
+				
+				else {
+					
+					Yogurt.Alert({
+						msg : P({
+							style : {
+								fontSize : 14
+							},
+							c : [
+								'PC에서 접속하셨군요! 반갑습니다.\n',
+								'그런데 손님, 이더덕은 이더리움 기반 서비스라 이더리움 네트워크에 연결되야 사용이 가능하답니다! ㅜ.ㅜ\n',
+								'괜찮으시면 ', A({
+									style : {
+										color : '#ffcc00',
+										fontWeight : 'bold'
+									},
+									href : 'https://metamask.io/',
+									c : 'MetaMask'
+								}) ,'를 다운로드받아 사용해 보시겠어요?'
+							]
+						})
+					});
+				}
+			}
 		});
 		</script>
 	</body>
