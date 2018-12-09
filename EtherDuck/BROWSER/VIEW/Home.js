@@ -29,7 +29,18 @@ EtherDuck.Home = CLASS({
 					}
 				},
 				c : [P({
-					c : '이더리움 덕후들을 위한 게시판 서비스, 이더덕!'
+					style : {
+						textAlign : 'center'
+					},
+					c : [
+						'이더리움 덕후들을 위한 게시판 서비스, 이더덕!\n',
+						SPAN({
+							style : {
+								color : '#999'
+							},
+							c : 'v1.0'
+						})
+					]
 				}), list = DIV({
 					c : P({
 						style : {

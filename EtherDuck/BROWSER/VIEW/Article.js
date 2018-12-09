@@ -146,7 +146,7 @@ EtherDuck.Article = CLASS({
 				article.append(menu = DIV({
 					c : DIV({
 						style : {
-							fontSize : 30,
+							fontSize : 20,
 							color : '#ccc',
 							textAlign : 'right'
 						},
@@ -165,7 +165,7 @@ EtherDuck.Article = CLASS({
 										
 										else {
 											
-											EtherDuck.LikeControllerContract.checkVoted('etherduck.com/article/' + articleId, (voted) => {
+											EtherDuck.LikeControllerContract.checkTargetVoted('etherduck.com/article/' + articleId, (voted) => {
 												if (voted === true) {
 													Yogurt.Alert({
 														msg : '이미 좋아요/싫어요 하신 게시물입니다.'
@@ -203,7 +203,7 @@ EtherDuck.Article = CLASS({
 							}
 						}), dislikeButton = A({
 							style : {
-								marginLeft : 10
+								marginLeft : 20
 							},
 							c : FontAwesome.GetIcon('thumbs-down'),
 							on : {
@@ -219,7 +219,7 @@ EtherDuck.Article = CLASS({
 										
 										else {
 											
-											EtherDuck.LikeControllerContract.checkVoted('etherduck.com/article/' + articleId, (voted) => {
+											EtherDuck.LikeControllerContract.checkTargetVoted('etherduck.com/article/' + articleId, (voted) => {
 												if (voted === true) {
 													Yogurt.Alert({
 														msg : '이미 좋아요/싫어요 하신 게시물입니다.'
@@ -259,10 +259,23 @@ EtherDuck.Article = CLASS({
 					})
 				}));
 				
+				EtherDuck.LikeControllerContract.getLikeCountByTarget('etherduck.com/article/' + articleId, (likeCount) => {
+					likeButton.append(SPAN({
+						style : {
+							marginLeft : 6
+						},
+						c : likeCount
+					}));
+				});
 				
-				EtherDuck.LikeControllerContract.getLikeCountByTarget();
-				
-				EtherDuck.LikeControllerContract.getDislikeCountByTarget();
+				EtherDuck.LikeControllerContract.getDislikeCountByTarget('etherduck.com/article/' + articleId, (dislikeCount) => {
+					dislikeButton.append(SPAN({
+						style : {
+							marginLeft : 6
+						},
+						c : dislikeCount
+					}));
+				});
 				
 				Contract2Object.getWalletAddress((walletAddress) => {
 					
@@ -270,7 +283,7 @@ EtherDuck.Article = CLASS({
 						
 						menu.append(Yogurt.Button({
 							style : {
-								marginTop : 10,
+								marginTop : 20,
 								onDisplayResize : (width, height) => {
 									if (width < 800) {
 										return {
@@ -295,7 +308,7 @@ EtherDuck.Article = CLASS({
 						
 						menu.append(Yogurt.Button({
 							style : {
-								marginTop : 10,
+								marginTop : 20,
 								onDisplayResize : (width, height) => {
 									if (width < 800) {
 										return {
@@ -457,18 +470,147 @@ EtherDuck.Article = CLASS({
 								
 								// 수정 및 삭제
 								let menu;
+								let likeButton;
+								let dislikeButton;
 								comment.append(menu = DIV({
 									style : {
 										flt : 'right',
 										color : '#ccc'
-									}
+									},
+									c : [likeButton = A({
+										c : FontAwesome.GetIcon('thumbs-up'),
+										on : {
+											tap : () => {
+												
+												Contract2Object.checkWalletLocked((isLocked) => {
+													
+													if (isLocked === true) {
+														Yogurt.Alert({
+															msg : '이더리움 지갑이 잠겨있습니다. 지갑을 열어 잠금을 해제해주세요.'
+														});
+													}
+													
+													else {
+														
+														EtherDuck.LikeControllerContract.checkTargetVoted('etherduck.com/comment/' + commentId, (voted) => {
+															if (voted === true) {
+																Yogurt.Alert({
+																	msg : '이미 좋아요/싫어요 하신 댓글입니다.'
+																});
+															}
+															
+															else {
+																
+																EtherDuck.LikeControllerContract.like('etherduck.com/comment/' + commentId, {
+																	
+																	transactionAddress : (transactionAddress) => {
+																		
+																		Yogurt.Alert({
+																			msg : ['트랜잭션이 등록되었습니다.', BR(), A({
+																				style : {
+																					color : '#ffcc00',
+																					fontWeight : 'bold'
+																				},
+																				target : '_blank',
+																				href : 'https://etherscan.io/tx/' + transactionAddress,
+																				c : 'EtherScan에서 보기'
+																			})]
+																		});
+																	},
+																	
+																	success : () => {
+																		//TODO:
+																	}
+																});
+															}
+														});
+													}
+												});
+											}
+										}
+									}), dislikeButton = A({
+										style : {
+											marginLeft : 8
+										},
+										c : FontAwesome.GetIcon('thumbs-down'),
+										on : {
+											tap : () => {
+												
+												Contract2Object.checkWalletLocked((isLocked) => {
+													
+													if (isLocked === true) {
+														Yogurt.Alert({
+															msg : '이더리움 지갑이 잠겨있습니다. 지갑을 열어 잠금을 해제해주세요.'
+														});
+													}
+													
+													else {
+														
+														EtherDuck.LikeControllerContract.checkTargetVoted('etherduck.com/comment/' + commentId, (voted) => {
+															if (voted === true) {
+																Yogurt.Alert({
+																	msg : '이미 좋아요/싫어요 하신 댓글입니다.'
+																});
+															}
+															
+															else {
+																
+																EtherDuck.LikeControllerContract.dislike('etherduck.com/comment/' + commentId, {
+																	
+																	transactionAddress : (transactionAddress) => {
+																		
+																		Yogurt.Alert({
+																			msg : ['트랜잭션이 등록되었습니다.', BR(), A({
+																				style : {
+																					color : '#ffcc00',
+																					fontWeight : 'bold'
+																				},
+																				target : '_blank',
+																				href : 'https://etherscan.io/tx/' + transactionAddress,
+																				c : 'EtherScan에서 보기'
+																			})]
+																		});
+																	},
+																	
+																	success : () => {
+																		//TODO:
+																	}
+																});
+															}
+														});
+													}
+												});
+											}
+										}
+									})]
 								}));
+								
+								EtherDuck.LikeControllerContract.getLikeCountByTarget('etherduck.com/comment/' + commentId, (likeCount) => {
+									likeButton.append(SPAN({
+										style : {
+											marginLeft : 4
+										},
+										c : likeCount
+									}));
+								});
+								
+								EtherDuck.LikeControllerContract.getDislikeCountByTarget('etherduck.com/comment/' + commentId, (dislikeCount) => {
+									dislikeButton.append(SPAN({
+										style : {
+											marginLeft : 4
+										},
+										c : dislikeCount
+									}));
+								});
 								
 								Contract2Object.getWalletAddress((walletAddress) => {
 									
 									if (walletAddress === writer) {
 										
 										menu.append(A({
+											style : {
+												marginLeft : 8
+											},
 											c : FontAwesome.GetIcon('edit'),
 											on : {
 												tap : () => {

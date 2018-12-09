@@ -3,71 +3,108 @@ pragma solidity ^0.5.1;
 import "./NetworkChecker.sol";
 import "./CommentControllerInterface.sol";
 
-contract CommentGasController is CommentControllerInterface {
+contract CommentGasController is NetworkChecker, CommentControllerInterface {
 	
-	struct Comment {
-		address writer;
-		string target;
-		string content;
-		uint writeTime;
-		uint lastUpdateTime;
+	CommentControllerInterface private commentController;
+	
+	constructor() NetworkChecker() public {
+		if (network == Network.Mainnet) {
+			commentController = CommentControllerInterface(0x49f1CaA1E50275CdF84eA4896b584f748153Eee2);
+		} else if (network == Network.Kovan) {
+			commentController = CommentControllerInterface(0x9940ec104F24c61Acd7aA6573A4217e878A1505E);
+		} else if (network == Network.Ropsten) {
+			commentController = CommentControllerInterface(0x8d536d404Ee307Dd6FF8599F1Af1ff76AfCde69d);
+		} else if (network == Network.Rinkeby) {
+			commentController = CommentControllerInterface(0x32A7A93353C2CF233Ad2899A5ca081ac7492e602);
+		} else {
+			revert();
+		}
 	}
 	
-	Comment[] public comments;
-	
+	mapping(uint => address) private commentIdToWriter;
 	mapping(address => uint[]) private writerToCommentIds;
-	mapping(string => uint[]) private targetToCommentIds;
+	
+	struct GasInfo {
+		address writer;
+		string behavior;
+		uint commentId;
+		uint gasUsed;
+	}
+	
+	GasInfo[] public gasInfos;
+	
+	function getGasInfoCount() external view returns (uint) {
+		return gasInfos.length;
+	}
 	
 	function write(string calldata target, string calldata content) external returns (uint) {
 		
-		uint writeTime = now;
+		uint startGas = gasleft();
 		
-		uint commentId = comments.push(Comment({
-			writer : msg.sender,
-			target : target,
-			content : content,
-			writeTime : writeTime,
-			lastUpdateTime : writeTime
-		})).sub(1);
+		uint commentId = commentController.write(target, content);
 		
+		commentIdToWriter[commentId] = msg.sender;
 		writerToCommentIds[msg.sender].push(commentId);
-		targetToCommentIds[target].push(commentId);
 		
-		emit Write(msg.sender, target, content, writeTime);
+		gasInfos.push(GasInfo({
+			writer : msg.sender,
+			behavior : 'write',
+			commentId : commentId,
+			gasUsed : startGas - gasleft()
+		}));
+		
+		emit Write(msg.sender, target, content, now);
 		
 		return commentId;
 	}
 	
 	function read(uint commentId) external view returns (address writer, string memory target, string memory content, uint writeTime, uint lastUpdateTime) {
-		Comment memory comment = comments[commentId];
-		return (comment.writer, comment.target, comment.content, comment.writeTime, comment.lastUpdateTime);
+		
+		( , target, content, writeTime, lastUpdateTime) = commentController.read(commentId);
+		
+		return (commentIdToWriter[commentId], target, content, writeTime, lastUpdateTime);
 	}
 	
 	function update(uint commentId, string calldata content) external {
 		
-		Comment storage comment = comments[commentId];
+		uint startGas = gasleft();
 		
-		require(comment.writer == msg.sender);
+		require(commentIdToWriter[commentId] == msg.sender);
 		
-		uint updateTime = now;
+		commentController.update(commentId, content);
 		
-		comment.content = content;
-		comment.lastUpdateTime = updateTime;
+		gasInfos.push(GasInfo({
+			writer : msg.sender,
+			behavior : 'update',
+			commentId : commentId,
+			gasUsed : startGas - gasleft()
+		}));
 		
-		emit Update(commentId, msg.sender, content, updateTime);
+		emit Update(commentId, msg.sender, content, now);
 	}
 	
 	function remove(uint commentId) external {
 		
-		require(comments[commentId].writer == msg.sender);
+		uint startGas = gasleft();
 		
-		delete comments[commentId];
+		require(commentIdToWriter[commentId] == msg.sender);
+		
+		commentController.remove(commentId);
+		
+		delete commentIdToWriter[commentId];
+		
+		gasInfos.push(GasInfo({
+			writer : msg.sender,
+			behavior : 'remove',
+			commentId : commentId,
+			gasUsed : startGas - gasleft()
+		}));
 		
 		emit Remove(commentId);
 	}
 	
 	function getCommentCount() external view returns (uint) {
-		return comments.length;
+		return commentController.getCommentCount();
 	}
 	
 	function getCommentIdsByWriter(address writer) external view returns (uint[] memory) {
@@ -75,6 +112,6 @@ contract CommentGasController is CommentControllerInterface {
 	}
 	
 	function getCommentIdsByTarget(string calldata target) external view returns (uint[] memory) {
-		return targetToCommentIds[target];
+		return commentController.getCommentIdsByTarget(target);
 	}
 }
