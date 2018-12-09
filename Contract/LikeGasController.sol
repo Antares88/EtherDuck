@@ -1,25 +1,8 @@
 pragma solidity ^0.5.1;
 
-import "./NetworkChecker.sol";
 import "./LikeControllerInterface.sol";
 
-contract LikeGasController is NetworkChecker, LikeControllerInterface {
-	
-	LikeControllerInterface private likeController;
-	
-	constructor() NetworkChecker() public {
-		if (network == Network.Mainnet) {
-			likeController = LikeControllerInterface(0x0F442003E883664Bbb08e020276E715C2C59d820);
-		} else if (network == Network.Kovan) {
-			likeController = LikeControllerInterface(0xE7b69d8a931e408EADb714f41a7Fd19E7292345f);
-		} else if (network == Network.Ropsten) {
-			likeController = LikeControllerInterface(0xB5EA88F7EF23A21030C89899Ef48462BEA364535);
-		} else if (network == Network.Rinkeby) {
-			likeController = LikeControllerInterface(0xA08365F2Abc17CF979dF04B6EDb634DfE609F68f);
-		} else {
-			revert();
-		}
-	}
+contract LikeGasController is LikeControllerInterface {
 	
 	struct GasInfo {
 		address writer;
@@ -33,11 +16,19 @@ contract LikeGasController is NetworkChecker, LikeControllerInterface {
 		return gasInfos.length;
 	}
 	
+	mapping(address => mapping(string => bool)) private voterToTargetVoted;
+	mapping(string => uint) private targetToLikeCount;
+	mapping(string => uint) private targetToDislikeCount;
+	
 	function like(string calldata target) external {
+		
+		require(voterToTargetVoted[msg.sender][target] != true);
 		
 		uint startGas = gasleft();
 		
-		likeController.like(target);
+		voterToTargetVoted[msg.sender][target] = true;
+		
+		targetToLikeCount[target] = targetToLikeCount[target].add(1);
 		
 		gasInfos.push(GasInfo({
 			writer : msg.sender,
@@ -50,9 +41,13 @@ contract LikeGasController is NetworkChecker, LikeControllerInterface {
 	
 	function dislike(string calldata target) external {
 		
+		require(voterToTargetVoted[msg.sender][target] != true);
+		
 		uint startGas = gasleft();
 		
-		likeController.dislike(target);
+		voterToTargetVoted[msg.sender][target] = true;
+		
+		targetToDislikeCount[target] = targetToDislikeCount[target].add(1);
 		
 		gasInfos.push(GasInfo({
 			writer : msg.sender,
@@ -64,14 +59,14 @@ contract LikeGasController is NetworkChecker, LikeControllerInterface {
 	}
 	
 	function checkTargetVoted(string calldata target) external view returns (bool) {
-		return likeController.checkTargetVoted(target);
+		return voterToTargetVoted[msg.sender][target];
 	}
 	
 	function getLikeCountByTarget(string calldata target) external view returns (uint) {
-		return likeController.getLikeCountByTarget(target);
+		return targetToLikeCount[target];
 	}
 	
 	function getDislikeCountByTarget(string calldata target) external view returns (uint) {
-		return likeController.getDislikeCountByTarget(target);
+		return targetToDislikeCount[target];
 	}
 }
