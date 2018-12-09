@@ -60,7 +60,7 @@ contract LikeGasController is NetworkChecker, LikeControllerInterface {
 			gasUsed : startGas - gasleft()
 		}));
 		
-		emit Like(msg.sender, target);
+		emit Dislike(msg.sender, target);
 	}
 	
 	function checkTargetVoted(string calldata target) external view returns (bool) {
