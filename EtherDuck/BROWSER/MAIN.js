@@ -15,7 +15,7 @@ EtherDuck.MAIN = METHOD({
 		
 		EtherDuck.MATCH_VIEW({
 			uri : '{category}',
-			excludeURI : ['write', 'markdownsample'],
+			excludeURI : ['write', 'markdownsample', 'articlecache'],
 			target : EtherDuck.Category
 		});
 		

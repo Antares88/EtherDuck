@@ -8,7 +8,7 @@ EtherDuck.Article = CLASS({
 		
 		inner.on('paramsChange', (params) => {
 			
-			let articleId = params.articleId;
+			let articleId = INTEGER(params.articleId);
 			
 			let article;
 			EtherDuck.Layout.setContent(article = DIV({
@@ -33,7 +33,7 @@ EtherDuck.Article = CLASS({
 						color : '#999'
 					},
 					c : [IMG({
-						src : 'EtherDuck/R/loading.gif'
+						src : '/EtherDuck/R/loading.gif'
 					}), ' 글 내용을 불러오는 중입니다...']
 				})
 			}));
@@ -471,7 +471,7 @@ EtherDuck.Article = CLASS({
 									color : '#999'
 								},
 								c : [IMG({
-									src : 'EtherDuck/R/loading.gif'
+									src : '/EtherDuck/R/loading.gif'
 								}), ' 댓글 목록을 불러오는 중입니다...']
 							})
 						}), cachedCommentList = DIV(), FORM({

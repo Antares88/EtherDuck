@@ -216,7 +216,7 @@ EtherDuck.Form = CLASS({
 											let loading;
 											input.after(loading = DIV({
 												c : [IMG({
-													src : 'EtherDuck/R/loading.gif'
+													src : '/EtherDuck/R/loading.gif'
 												}), ' IFPS로 파일 업로드 중입니다...']
 											}));
 											

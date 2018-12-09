@@ -48,7 +48,7 @@ EtherDuck.Home = CLASS({
 						color : '#999'
 					},
 					c : [IMG({
-						src : 'EtherDuck/R/loading.gif'
+						src : '/EtherDuck/R/loading.gif'
 					}), ' 글 목록을 불러오는 중입니다...']
 				})
 			})]
