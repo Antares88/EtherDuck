@@ -37,7 +37,7 @@ EtherDuck.Home = CLASS({
 						style : {
 							color : '#999'
 						},
-						c : 'v1.0'
+						c : 'v1.1'
 					})
 				]
 			}), list = DIV({
