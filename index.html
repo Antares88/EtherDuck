@@ -25,6 +25,7 @@
 		<script src="/ipfs.js"></script>
 		<script src="/UPPERCASE-CORE/BROWSER.js"></script>
 		<!-- BOX -->
+		<script>global.oldWeb3 = global.web3;</script>
 		<script>BOX('Contract2Object');</script>
 		<script src="/BOX/Contract2Object/BROWSER.js"></script>
 		<script>BOX('UUI');</script>
@@ -86,11 +87,10 @@
 			BROWSER_CONFIG.infuraProjectId = 'af289fa108bf4d039e4c699573a02e2c';
 			
 			let isUsingOldWeb3;
-			if (global.web3 !== undefined && web3.version !== undefined && web3.version.api !== undefined) {
-				if (web3.version.api.substring(0, 2) === '0.') {
-					global.Contract2Object = Contract2ObjectForOldWeb3;
-					isUsingOldWeb3 = true;
-				}
+			if (global.oldWeb3 !== undefined) {
+				global.web3 = global.oldWeb3;
+				global.Contract2Object = Contract2ObjectForOldWeb3;
+				isUsingOldWeb3 = true;
 			}
 			
 			FOR_BOX((box) => {
@@ -108,7 +108,10 @@
 			});
 			
 			// 기본 공급자가 없는 경우 알림
-			if (isUsingOldWeb3 !== true && Web3.givenProvider !== undefined) {
+			if (isUsingOldWeb3 !== true && (
+				Web3.givenProvider === undefined ||
+				Web3.givenProvider === TO_DELETE
+			)) {
 				
 				// 모바일에서
 				if (INFO.getOSName() === 'Android' || INFO.getOSName() === 'iOS') {
