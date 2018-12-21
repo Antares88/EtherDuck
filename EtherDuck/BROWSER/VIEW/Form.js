@@ -56,14 +56,7 @@ EtherDuck.Form = CLASS({
 					
 					if (articleId !== undefined) {
 						
-						EtherDuck.ArticleCacheManager.updateDone({
-							articleId : articleId,
-							category : category,
-							title : title,
-							content : content
-						});
-						
-						let updateCache = EtherDuck.ArticleCacheManager.getUpdateCache(articleId);
+						let updateCache = EtherDuck.ArticleControllerContract.getUpdateCache(articleId);
 						
 						if (updateCache !== undefined) {
 							category = updateCache.category;
@@ -291,7 +284,7 @@ EtherDuck.Form = CLASS({
 											
 											EtherDuck.ArticleControllerContract.write(data, {
 												
-												transactionAddress : (transactionAddress) => {
+												transactionHash : (transactionHash) => {
 													
 													Yogurt.Alert({
 														msg : ['트랜잭션이 등록되었습니다.', BR(), A({
@@ -300,7 +293,7 @@ EtherDuck.Form = CLASS({
 																fontWeight : 'bold'
 															},
 															target : '_blank',
-															href : 'https://etherscan.io/tx/' + transactionAddress,
+															href : 'https://etherscan.io/tx/' + transactionHash,
 															c : 'EtherScan에서 보기'
 														})]
 													});
@@ -308,7 +301,9 @@ EtherDuck.Form = CLASS({
 													cacheStore.clear();
 													
 													Contract2Object.getWalletAddress((walletAddress) => {
-														EtherDuck.ArticleCacheManager.writeCache({
+														
+														EtherDuck.ArticleControllerContract.addWriteCache({
+															transactionHash : transactionHash,
 															writer : walletAddress,
 															category : data.category,
 															title : data.title,
@@ -320,16 +315,6 @@ EtherDuck.Form = CLASS({
 												},
 												
 												error : (errorMsg) => {
-													
-													Contract2Object.getWalletAddress((walletAddress) => {
-														EtherDuck.ArticleCacheManager.writeDone({
-															writer : walletAddress,
-															category : data.category,
-															title : data.title,
-															content : data.content
-														});
-													});
-													
 													SHOW_ERROR('ArticleControllerContract.write', errorMsg, data);
 												}
 											});
@@ -342,7 +327,7 @@ EtherDuck.Form = CLASS({
 											
 											EtherDuck.ArticleControllerContract.update(data, {
 												
-												transactionAddress : (transactionAddress) => {
+												transactionHash : (transactionHash) => {
 													
 													Yogurt.Alert({
 														msg : ['트랜잭션이 등록되었습니다.', BR(), A({
@@ -351,12 +336,13 @@ EtherDuck.Form = CLASS({
 																fontWeight : 'bold'
 															},
 															target : '_blank',
-															href : 'https://etherscan.io/tx/' + transactionAddress,
+															href : 'https://etherscan.io/tx/' + transactionHash,
 															c : 'EtherScan에서 보기'
 														})]
 													});
 													
-													EtherDuck.ArticleCacheManager.updateCache({
+													EtherDuck.ArticleControllerContract.addUpdateCache({
+														transactionHash : transactionHash,
 														articleId : articleId,
 														category : data.category,
 														title : data.title,
@@ -367,14 +353,6 @@ EtherDuck.Form = CLASS({
 												},
 												
 												error : (errorMsg) => {
-													
-													EtherDuck.ArticleCacheManager.updateDone({
-														articleId : articleId,
-														category : data.category,
-														title : data.title,
-														content : data.content
-													});
-													
 													SHOW_ERROR('ArticleControllerContract.update', errorMsg, data);
 												}
 											});

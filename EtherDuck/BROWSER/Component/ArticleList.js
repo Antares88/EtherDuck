@@ -15,8 +15,7 @@ EtherDuck.ArticleList = CLASS({
 		let listCategory = params.category;
 		let listWriter = params.writer;
 		
-		let cachedArticles = {};
-		EACH(EtherDuck.ArticleCacheManager.getWriteCaches(listCategory === undefined ? undefined : 'etherduck.com/' + listCategory), (writeCache, key) => {
+		EACH(EtherDuck.ArticleControllerContract.getWriteCaches(listCategory === undefined ? undefined : 'etherduck.com/' + listCategory), (writeCache, key) => {
 			
 			let article;
 			self.append(article = DIV({
@@ -24,8 +23,6 @@ EtherDuck.ArticleList = CLASS({
 					marginTop : 40
 				}
 			}));
-			
-			cachedArticles[key] = article;
 			
 			let category = writeCache.category.substring('etherduck.com/'.length);
 			let title = writeCache.title;
@@ -150,26 +147,7 @@ EtherDuck.ArticleList = CLASS({
 			
 			EtherDuck.ArticleControllerContract.read(articleId, (writer, fullCategory, title, _content, writeTime, lastUpdateTime) => {
 				
-				let key = EtherDuck.ArticleCacheManager.writeDone({
-					writer : writer,
-					category : fullCategory,
-					title : title,
-					content : _content
-				});
-				
-				if (cachedArticles[key] !== undefined) {
-					cachedArticles[key].remove();
-					delete cachedArticles[key];
-				}
-				
-				EtherDuck.ArticleCacheManager.updateDone({
-					articleId : articleId,
-					category : fullCategory,
-					title : title,
-					content : _content
-				});
-				
-				let updateCache = EtherDuck.ArticleCacheManager.getUpdateCache(articleId);
+				let updateCache = EtherDuck.ArticleControllerContract.getUpdateCache(articleId);
 				
 				if (updateCache !== undefined) {
 					fullCategory = updateCache.category;
@@ -177,7 +155,7 @@ EtherDuck.ArticleList = CLASS({
 					_content = updateCache.content;
 				}
 				
-				if (EtherDuck.ArticleCacheManager.checkRemoveCache(articleId) || writer === '0x0000000000000000000000000000000000000000') {
+				if (EtherDuck.ArticleControllerContract.checkRemoveCache(articleId) || writer === '0x0000000000000000000000000000000000000000') {
 					article.remove();
 				}
 				

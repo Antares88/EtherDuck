@@ -76,7 +76,7 @@ EtherDuck.Home = CLASS({
 				list.empty();
 				
 				EtherDuck.ArticleList({
-					articleIds : articleIds.sort().reverse()
+					articleIds : articleIds.sort((a, b) => a - b).reverse()
 				}).appendTo(list);
 			};
 		}]);
