@@ -3,6 +3,7 @@ EtherDuck.NestNodeManager = OBJECT({
 	init : (inner, self) => {
 		
 		let nestNode;
+		let waitingHandlers = [];
 		
 		// 둥지 접속
 		DSide.Connect({
@@ -14,19 +15,25 @@ EtherDuck.NestNodeManager = OBJECT({
 			]
 		}, (node) => {
 			nestNode = node;
+			
+			EACH(waitingHandlers, (handler) => {
+				handler();
+			});
 		});
+		
+		let checkNestNodeConnected = (callback) => {
+			if (nestNode === undefined) {
+				waitingHandlers.push(callback);
+			} else {
+				callback();
+			}
+		};
 		
 		let saveComment = self.saveComment = (commentData, callback) => {
 			//REQUIRED: commentData
 			//REQUIRED: callback
 			
-			if (nestNode === undefined) {
-				Yogurt.Alert({
-					msg : '아직 둥지에 연결되지 않았습니다. 잠시 기다려주시거나, 새로고침 해 주시기 바랍니다.'
-				});
-			}
-			
-			else {
+			checkNestNodeConnected(() => {
 				
 				Contract2Object.getWalletAddress((address) => {
 					
@@ -44,7 +51,20 @@ EtherDuck.NestNodeManager = OBJECT({
 						}, console.log);
 					});
 				});
-			}
+			});
+		};
+		
+		let getComments = self.getComments = (target, callback) => {
+			//REQUIRED: target
+			//REQUIRED: callback
+			
+			checkNestNodeConnected(() => {
+				
+				nestNode.getDataSet({
+					storeName : 'Comment',
+					target : target
+				}, callback);
+			});
 		};
 	}
 });

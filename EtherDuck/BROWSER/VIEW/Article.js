@@ -689,8 +689,15 @@ EtherDuck.Article = CLASS({
 						})]
 					}));
 					
+					// 둥지에서 댓글 정보를 불러옵니다.
+					EtherDuck.NestNodeManager.getComments('etherduck.com/article/' + articleId, (commentDataSet) => {
+						console.log(commentDataSet);
+					});
+					
+					// 캐시된 이더리움 댓글들 추가
 					EACH(EtherDuck.CommentCacheManager.getWriteCaches('etherduck.com/article/' + articleId), createCachedComment);
 					
+					// 이더리움에서 댓글 정보를 불러옵니다.
 					EtherDuck.CommentControllerContract.getCommentIdsByTarget('etherduck.com/article/' + articleId, (commentIds) => {
 						
 						commentList.empty();
