@@ -510,6 +510,10 @@ EtherDuck.Article = CLASS({
 						}));
 					};
 					
+					let base = 'nest';
+					let nestButton;
+					let ethereumButton;
+					
 					// 댓글 기능
 					let commentList;
 					article.append(DIV({
@@ -543,11 +547,80 @@ EtherDuck.Article = CLASS({
 									padding : 10
 								},
 								value : '댓글 작성'
-							})],
+							}), DIV({
+								style : {
+									marginTop : 10,
+									flt : 'right',
+									fontSize : 14,
+									color : '#666'
+								},
+								c : [A({
+									style : {
+										marginTop : 17,
+										marginRight : 20,
+										flt : 'left',
+										color : '#999'
+									},
+									c : [FontAwesome.GetIcon('question-circle'), ' 둥지란?']
+								}), nestButton = UUI.BUTTON_H({
+									style : {
+										flt : 'left',
+										padding : '10px 20px',
+										border : '1px solid #eee',
+										borderRadius : '10px 0 0 10px',
+										backgroundColor : '#fff'
+									},
+									icon : IMG({
+										src : '/EtherDuck/R/nest.png'
+									}),
+									spacing : 10,
+									title : '둥지에 등록',
+									on : {
+										tap : () => {
+											base = 'nest';
+											nestButton.addStyle({
+												backgroundColor : '#fff'
+											});
+											ethereumButton.addStyle({
+												backgroundColor : '#eee'
+											});
+										}
+									}
+								}), ethereumButton = UUI.BUTTON_H({
+									style : {
+										marginLeft : -1,
+										flt : 'left',
+										padding : '10px 20px',
+										border : '1px solid #eee',
+										borderRadius : '0 10px 10px 0',
+										backgroundColor : '#eee'
+									},
+									icon : IMG({
+										src : '/EtherDuck/R/ethereum.png'
+									}),
+									spacing : 10,
+									title : '이더리움에 등록',
+									on : {
+										tap : () => {
+											base = 'ethereum';
+											nestButton.addStyle({
+												backgroundColor : '#eee'
+											});
+											ethereumButton.addStyle({
+												backgroundColor : '#fff'
+											});
+										}
+									}
+								}), CLEAR_BOTH()]
+							}), CLEAR_BOTH()],
 							on : {
 								submit : (e, form) => {
 									
 									Contract2Object.checkWalletLocked((isLocked) => {
+										
+										let data = form.getData();
+										
+										data.target = 'etherduck.com/article/' + articleId;
 										
 										if (isLocked === true) {
 											Yogurt.Alert({
@@ -555,11 +628,14 @@ EtherDuck.Article = CLASS({
 											});
 										}
 										
+										// 둥지에 저장
+										else if (base === 'nest') {
+											
+											EtherDuck.NestNodeManager.saveComment(data);
+										}
+										
+										// 이더리움에 저장
 										else {
-											
-											let data = form.getData();
-											
-											data.target = 'etherduck.com/article/' + articleId;
 											
 											EtherDuck.CommentControllerContract.write(data, {
 												

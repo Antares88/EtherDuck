@@ -2,46 +2,17 @@ EtherDuck.MAIN = METHOD({
 
 	run : () => {
 		
-		/*DSide.Connect({
+		// 둥지 접속
+		DSide.Connect({
 			port : 8231,
 			ips : [
-				'192.168.0.7'*,
 				'175.207.29.156',
 				'110.11.179.222',
-				'59.6.136.208'*
+				'59.6.136.208'
 			]
 		}, (node) => {
-			console.log('CONNECTED!');
 			
-			console.log(node.getNodeTime(new Date()));
-			
-			window.web3 = new Web3(Web3.givenProvider);
-			
-			web3.eth.getAccounts((error, accounts) => {
-				
-				let address = accounts[0];
-				let data = {
-					storeName : 'Comment',
-					address : address,
-					target : 'test target',
-					content : 'test content',
-					createTime : node.getNodeTime(new Date())
-				};
-				
-				let sortedData = {};
-				Object.keys(data).sort().forEach((key) => {
-					sortedData[key] = data[key];
-				});
-				
-				web3.eth.personal.sign(STRINGIFY(sortedData), address, (error, hash) => {
-					
-					node.saveData({
-						hash : hash,
-						data : data
-					}, console.log);
-				});
-			});
-		});*/
+		});
 		
 		EtherDuck.MATCH_VIEW({
 			uri : '**',
